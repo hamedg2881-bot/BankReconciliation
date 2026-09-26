@@ -740,6 +740,12 @@
 
             });
 
+            $("#btnChangeReconciliation").on("click", function () {
+
+                self.prepareNewReconciliation();
+
+            });
+
             $("#btnRefresh").on("click", function () {
 
                 if (
@@ -1074,6 +1080,7 @@
                     );
 
                     self.resetSelection();
+                    self.renderReconciliationContext(response.Result.Reconciliation || response.Result);
                     self.updateButtons();
                     self.reloadBankTable();
 
@@ -1562,6 +1569,97 @@
 
             $("#selectedTransactionRemaining")
                 .text("-");
+
+        },
+
+        prepareNewReconciliation: function () {
+
+            this.state.reconciliationId = 0;
+            this.state.reconciliationState = 0;
+            this.state.page = 1;
+            this.state.status = null;
+            this.state.search = "";
+
+            $("#BankAccountId")
+                .prop("disabled", false);
+
+            $("#FromDate")
+                .prop("disabled", false);
+
+            $("#ToDate")
+                .prop("disabled", false);
+
+            $("#txtSearch")
+                .val("");
+
+            $("#btnLoad")
+                .prop("disabled", false)
+                .html('<i class="fas fa-search ml-1"></i> نمایش');
+
+            $("#reconciliationContext")
+                .addClass("d-none");
+
+            this.resetSelection();
+            this.renderSummary({
+                TotalTransactions: 0,
+                MatchedTransactions: 0,
+                PartialTransactions: 0,
+                UnmatchedTransactions: 0,
+                RemainingAmount: 0,
+                MatchPercentage: 0
+            });
+
+            this.reloadBankTable();
+            this.reloadCandidateTable();
+            this.updateButtons();
+
+        },
+
+        renderReconciliationContext: function (reconciliation) {
+
+            if (!reconciliation) {
+                return;
+            }
+
+            var title =
+                reconciliation.BankAccountTitle ||
+                "حساب بانکی";
+
+            var fromDate =
+                this.formatDate(reconciliation.FromDate);
+
+            var toDate =
+                this.formatDate(reconciliation.ToDate);
+
+            var state =
+                Number(reconciliation.State) === 1
+                    ? "نهایی شده"
+                    : "در حال ویرایش";
+
+            $("#reconciliationContextTitle")
+                .text(title);
+
+            $("#reconciliationContextDate")
+                .text(fromDate + " تا " + toDate);
+
+            $("#reconciliationContextState")
+                .text(state);
+
+            $("#reconciliationContext")
+                .removeClass("d-none");
+
+            $("#BankAccountId")
+                .prop("disabled", true);
+
+            $("#FromDate")
+                .prop("disabled", true);
+
+            $("#ToDate")
+                .prop("disabled", true);
+
+            $("#btnLoad")
+                .prop("disabled", true)
+                .html('<i class="fas fa-check ml-1"></i> بارگذاری شد');
 
         },
 
