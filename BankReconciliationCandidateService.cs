@@ -229,36 +229,48 @@ namespace CDS.BIMS.Application.Service.Financial
                 var candidateToDate =
                     transactionDate.AddDays(3);
 
+                var accountingDocDates =
+                    _accountingDocRepository.Query
+                        .Where(x =>
+                            x.AccountingDocDate >= candidateFromDate &&
+                            x.AccountingDocDate < candidateToDate)
+                        .Select(x => new
+                        {
+                            x.Id,
+                            x.AccountingDocDate
+                        })
+                        .ToList();
+
+                var accountingDocIds =
+                    accountingDocDates
+                        .Select(x => x.Id)
+                        .ToList();
+
+                var details =
+                    _accountingDocDetailRepository.Query
+                        .Include(x => x.Account)
+                        .Include(x => x.DepositSlip)
+                        .Include(x => x.Cheque)
+                        .Where(x =>
+                            accountingDocIds.Contains(
+                                x.AccountingDocId) &&
+                            allowedAccountIds.Contains(
+                                x.AccountId) &&
+                            x.AccountingDocDetailCenters
+                                .Any(y =>
+                                    y.CenterId == centerId))
+                        .ToList();
+
                 var detailsQuery =
-                    from detail in
-                        _accountingDocDetailRepository.Query
-                            .Include(x => x.Account)
-                            .Include(x => x.DepositSlip)
-                            .Include(x => x.Cheque)
+                    from detail in details
 
                     join accountingDoc in
-                        _accountingDocRepository.Query
+                        accountingDocDates
                         on detail.AccountingDocId equals
                         accountingDoc.Id
 
-                    where
-                        allowedAccountIds.Contains(
-                            detail.AccountId)
-
-                        &&
-                        accountingDoc.AccountingDocDate
-                        >= candidateFromDate
-
-                        &&
-                        accountingDoc.AccountingDocDate
-                        < candidateToDate
-
-                        &&
-                        detail.AccountingDocDetailCenters
-                            .Any(x =>
-                                x.CenterId == centerId)
-
-                    join matchSum in matchSums
+                    join matchSum in
+                        matchSums.ToList()
                         on detail.Id equals
                         matchSum.AccountingDocDetailId
                         into detailMatches
