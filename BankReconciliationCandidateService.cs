@@ -156,9 +156,9 @@ namespace CDS.BIMS.Application.Service.Financial
                         MatchedAmount = g.Sum(x => x.MatchedAmount)
                     };
 
-                var dateTolerance = filter.DateTolerance <= 0 ? 2 : filter.DateTolerance;
+                var dateTolerance = filter.DateTolerance < 0 ? 0 : filter.DateTolerance;
 
-                if (dateTolerance != 1 && dateTolerance != 2)
+                if (dateTolerance < 0 || dateTolerance > 2)
                 {
                     return Error<BankReconciliationCandidateResultDto>(
                         "اختلاف تاریخ انتخاب شده نامعتبر است.");
@@ -191,6 +191,20 @@ namespace CDS.BIMS.Application.Service.Financial
                         allowedAccountIds.Contains(x.AccountId) &&
                         x.AccountingDocDetailCenters.Any(y =>
                             y.CenterId == centerId))
+                    .ToList();
+
+                var counterpartDetails = _accountingDocDetailRepository.Query
+                    .Include(x => x.AccountingDocDetailCenters.Select(y => y.Center))
+                    .Where(x =>
+                        accountingDocIds.Contains(x.AccountingDocId))
+                    .Select(x => new
+                    {
+                        x.Id,
+                        x.AccountingDocId,
+                        CenterTitles = x.AccountingDocDetailCenters
+                            .Where(y => y.Center != null)
+                            .Select(y => y.Center.Title)
+                    })
                     .ToList();
 
                 var depositSlipIds = details
@@ -295,6 +309,16 @@ namespace CDS.BIMS.Application.Service.Financial
                                 detail.AccountingDocDetailCenters
                                     .Where(y => y.Center != null)
                                     .Select(y => y.Center.Title)
+                                    .Where(y => !string.IsNullOrWhiteSpace(y))
+                                    .Distinct()
+                                    .ToList()),
+                            CounterpartCenterTitle = string.Join(
+                                "، ",
+                                counterpartDetails
+                                    .Where(y =>
+                                        y.AccountingDocId == detail.AccountingDocId &&
+                                        y.Id != detail.Id)
+                                    .SelectMany(y => y.CenterTitles)
                                     .Where(y => !string.IsNullOrWhiteSpace(y))
                                     .Distinct()
                                     .ToList()),
