@@ -820,6 +820,8 @@
             this.state.selectedAccountingDetailIds =
                 [];
 
+            this.state.candidateMode = 0;
+
             this.state.bankTable
                 .rows()
                 .deselect();
