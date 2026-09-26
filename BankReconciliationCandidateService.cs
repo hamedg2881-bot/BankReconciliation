@@ -22,6 +22,9 @@ namespace CDS.BIMS.Application.Service.Financial
         private readonly IRepository<BankTransaction>
             _bankTransactionRepository;
 
+        private readonly IRepository<BankAccount>
+            _bankAccountRepository;
+
         private readonly IRepository<BankReconciliationMatch>
             _matchRepository;
 
@@ -34,6 +37,7 @@ namespace CDS.BIMS.Application.Service.Financial
         public BankReconciliationCandidateService(
             IRepository<BankReconciliation> bankReconciliationRepository,
             IRepository<BankTransaction> bankTransactionRepository,
+            IRepository<BankAccount> bankAccountRepository,
             IRepository<BankReconciliationMatch> matchRepository,
             IAccountingDocDetailRepository accountingDocDetailRepository,
             IRepository<Setting> settingRepository)
@@ -43,6 +47,9 @@ namespace CDS.BIMS.Application.Service.Financial
 
             _bankTransactionRepository =
                 bankTransactionRepository;
+
+            _bankAccountRepository =
+                bankAccountRepository;
 
             _matchRepository =
                 matchRepository;
@@ -85,7 +92,18 @@ namespace CDS.BIMS.Application.Service.Financial
                         "مغایرت بانکی مورد نظر یافت نشد.");
                 }
 
-                if (!reconciliation.BankAccount.CenterId.HasValue)
+                var bankAccount =
+                    _bankAccountRepository.Query
+                        .FirstOrDefault(x =>
+                            x.Id == reconciliation.BankAccountId);
+
+                if (bankAccount == null)
+                {
+                    return Error<BankReconciliationCandidateResultDto>(
+                        "حساب بانکی مورد نظر یافت نشد.");
+                }
+
+                if (!bankAccount.CenterId.HasValue)
                 {
                     return Error<BankReconciliationCandidateResultDto>(
                         "برای این حساب بانکی مرکز تعریف نشده است و امکان مغایرت‌گیری وجود ندارد.");
@@ -185,7 +203,7 @@ namespace CDS.BIMS.Application.Service.Financial
                 }
 
                 var centerId =
-                    reconciliation.BankAccount.CenterId.Value;
+                    bankAccount.CenterId.Value;
 
                 var matchSums =
                     from match in _matchRepository.Query
@@ -332,12 +350,8 @@ namespace CDS.BIMS.Application.Service.Financial
                                     centerId,
 
                                 CenterTitle =
-                                    reconciliation.BankAccount
-                                        .Center != null
-                                        ? reconciliation
-                                            .BankAccount
-                                            .Center
-                                            .Title
+                                    bankAccount.Center != null
+                                        ? bankAccount.Center.Title
                                         : null,
 
                                 Credit =
