@@ -391,6 +391,7 @@
                     pageLength: 30,
                     pagingType: "simple_numbers",
                     autoWidth: false,
+                    scrollX: false,
 
                     dom: "rt<'row'<'col'l><'col'p><'col'i>>",
                     select: {
@@ -553,7 +554,7 @@
 
                         {
                             data: "AccountTitle",
-                            width: "13%",
+                            width: "16%",
                             render: function (data) {
 
                                 return self.escapeHtml(
@@ -565,7 +566,7 @@
 
                         {
                             data: "Description",
-                            width: "22%",
+                            width: "32%",
                             render: function (data) {
 
                                 return '<div class="br-description">' +
@@ -593,29 +594,17 @@
                         {
                             data: "Amount",
                             className: "text-left",
-                            width: "13%",
+                            width: "14%",
                             render: function (data) {
 
                                 return self.formatAmount(data);
 
                             }
                         },
-
-                        {
-                            data: "RemainingAmount",
-                            className: "text-left",
-                            width: "85px",
-                            render: function (data) {
-
-                                return self.formatAmount(data);
-
-                            }
-                        },
-
-                        {
+{
                             data: "AmountDifference",
                             className: "text-left",
-                            width: "11%",
+                            width: "10%",
                             render: function (data) {
 
                                 return self.formatAmount(data);
