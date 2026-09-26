@@ -1,0 +1,550 @@
+﻿#bankReconciliationArea {
+    font-size: 12px;
+}
+
+    #bankReconciliationArea .card {
+        border-radius: 0;
+    }
+
+    #bankReconciliationArea .br-card {
+        border: 0;
+    }
+
+    #bankReconciliationArea .br-header-actions {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+    }
+
+        #bankReconciliationArea .br-header-actions .btn {
+            min-width: 30px;
+        }
+
+    #bankReconciliationArea .br-filter-card {
+        background-color: rgba(0, 0, 0, .02);
+        border: 1px solid rgba(38, 57, 99, .12);
+    }
+
+    #bankReconciliationArea .select2-container {
+        width: 100% !important;
+    }
+
+    #bankReconciliationArea .md-form {
+        margin-top: 1rem;
+        margin-bottom: .5rem;
+    }
+
+        #bankReconciliationArea .md-form label {
+            font-size: 12px;
+        }
+
+    #bankReconciliationArea .form-control {
+        font-size: 12px;
+    }
+
+    #bankReconciliationArea .br-summary-card {
+        border: 1px solid rgba(38, 57, 99, .15);
+        box-shadow: none;
+        transition: .3s;
+    }
+
+        #bankReconciliationArea .br-summary-card:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .12);
+        }
+
+        #bankReconciliationArea .br-summary-card .card-body {
+            display: flex;
+            align-items: center;
+            min-height: 62px;
+        }
+
+    #bankReconciliationArea .br-summary-icon {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #1f2f52;
+        color: #B0CB1F;
+        border-radius: 2px;
+        margin-left: 10px;
+    }
+
+    #bankReconciliationArea .br-summary-content {
+        min-width: 0;
+    }
+
+    #bankReconciliationArea .br-summary-label {
+        color: #777;
+        font-size: 11px;
+        margin-bottom: 2px;
+    }
+
+    #bankReconciliationArea .br-summary-value {
+        color: #263963;
+        font-size: 16px;
+        font-weight: bold;
+        direction: ltr;
+        text-align: right;
+    }
+
+    #bankReconciliationArea .br-progress-card {
+        border: 1px solid rgba(38, 57, 99, .15);
+    }
+
+    #bankReconciliationArea .br-progress-title {
+        color: #263963;
+        font-weight: bold;
+    }
+
+    #bankReconciliationArea .br-progress-percent {
+        color: #263963;
+        font-weight: bold;
+        direction: ltr;
+    }
+
+    #bankReconciliationArea .br-progress {
+        height: 8px;
+        border-radius: 0;
+        background-color: rgba(38, 57, 99, .12);
+    }
+
+        #bankReconciliationArea .br-progress .progress-bar {
+            background-color: #B0CB1F !important;
+        }
+
+    #bankReconciliationArea .br-progress-info {
+        color: #777;
+        font-size: 10px;
+    }
+
+    #bankReconciliationArea .br-tabs-wrapper {
+        width: auto;
+    }
+
+    #bankReconciliationArea .br-tabs {
+        margin: 0;
+        padding: 0;
+    }
+
+        #bankReconciliationArea .br-tabs .nav-link {
+            color: #263963;
+            font-size: 11px;
+            padding: .45rem .8rem;
+            border-radius: 0;
+        }
+
+            #bankReconciliationArea .br-tabs .nav-link:hover {
+                background-color: rgba(38, 57, 99, .08);
+            }
+
+            #bankReconciliationArea .br-tabs .nav-link.active {
+                background-color: #1f2f52;
+                color: #B0CB1F;
+            }
+
+    #bankReconciliationArea .br-tab-badge {
+        margin-right: 3px;
+        background-color: rgba(176, 203, 31, .2);
+        color: #263963;
+        font-size: 9px;
+        padding: 2px 5px;
+    }
+
+    #bankReconciliationArea .br-tabs .nav-link.active .br-tab-badge {
+        background-color: #B0CB1F;
+        color: #1f2f52;
+    }
+
+    #bankReconciliationArea .br-transaction-tools {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    #bankReconciliationArea .br-search {
+        width: 190px;
+    }
+
+        #bankReconciliationArea .br-search .form-control {
+            height: 28px;
+            font-size: 11px;
+        }
+
+        #bankReconciliationArea .br-search .input-group-text {
+            height: 28px;
+            font-size: 10px;
+            background-color: #fff;
+            border-right: 0;
+        }
+
+        #bankReconciliationArea .br-search .form-control {
+            border-left: 0;
+        }
+
+    #bankReconciliationArea .br-transaction-tools .btn {
+        font-size: 11px;
+        padding: .3rem .7rem;
+    }
+
+    #bankReconciliationArea .br-section-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: #263963;
+        font-weight: bold;
+        border-bottom: 1px solid rgba(38, 57, 99, .18);
+        padding: 5px 3px;
+        margin-bottom: 4px;
+    }
+
+        #bankReconciliationArea .br-section-title .badge {
+            font-size: 10px;
+            padding: 3px 7px;
+        }
+
+    #bankReconciliationArea .br-table-container {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    #bankReconciliationArea .dataTables_wrapper {
+        width: 100%;
+        font-size: 12px;
+    }
+
+        #bankReconciliationArea .dataTables_wrapper .dataTables_scroll {
+            width: 100%;
+        }
+
+        #bankReconciliationArea .dataTables_wrapper table.dataTable {
+            width: 100% !important;
+            margin: 0 !important;
+            border-collapse: collapse !important;
+        }
+
+            #bankReconciliationArea .dataTables_wrapper table.dataTable thead th {
+                color: #263963;
+                font-size: 12px;
+                font-weight: bold;
+                text-align: center;
+                vertical-align: middle;
+                white-space: nowrap;
+                padding: .3rem .4rem;
+            }
+
+            #bankReconciliationArea .dataTables_wrapper table.dataTable tbody td {
+                font-size: 12px;
+                vertical-align: middle;
+                padding: .2rem .4rem;
+            }
+
+            #bankReconciliationArea .dataTables_wrapper table.dataTable tbody tr {
+                cursor: pointer;
+            }
+
+                #bankReconciliationArea .dataTables_wrapper table.dataTable tbody tr:hover {
+                    background-color: rgba(38, 57, 99, .275);
+                }
+
+                #bankReconciliationArea .dataTables_wrapper table.dataTable tbody tr.selected {
+                    background-color: #263963 !important;
+                    color: #fff !important;
+                }
+
+                    #bankReconciliationArea .dataTables_wrapper table.dataTable tbody tr.selected td {
+                        color: #fff !important;
+                    }
+
+                    #bankReconciliationArea .dataTables_wrapper table.dataTable tbody tr.selected:hover {
+                        background-color: #263963 !important;
+                    }
+
+            #bankReconciliationArea .dataTables_wrapper table.dataTable.table-striped tbody tr:nth-of-type(odd) {
+                background-color: rgba(0, 0, 0, .06);
+            }
+
+            #bankReconciliationArea .dataTables_wrapper table.dataTable.table-striped tbody tr.selected:nth-of-type(odd) {
+                background-color: #263963 !important;
+            }
+
+            #bankReconciliationArea .dataTables_wrapper table.dataTable.table-bordered {
+                border: 1px solid #dee2e6;
+            }
+
+                #bankReconciliationArea .dataTables_wrapper table.dataTable.table-bordered th,
+                #bankReconciliationArea .dataTables_wrapper table.dataTable.table-bordered td {
+                    border: 1px solid #dee2e6;
+                }
+
+            #bankReconciliationArea .dataTables_wrapper table.dataTable tbody tr.selected td {
+                border-color: rgba(255, 255, 255, .12);
+            }
+
+    #bankReconciliationArea .br-table-time {
+        color: #777;
+        font-size: 9px;
+        direction: ltr;
+        margin-top: 1px;
+    }
+
+    #bankReconciliationArea table.dataTable tbody tr.selected .br-table-time {
+        color: rgba(255, 255, 255, .7);
+    }
+
+    #bankReconciliationArea .br-description {
+        max-width: 300px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        text-align: right;
+    }
+
+    #bankReconciliationArea .br-credit {
+        color: #263963;
+        font-weight: bold;
+        direction: ltr;
+        white-space: nowrap;
+    }
+
+    #bankReconciliationArea .br-debit {
+        color: #8b3030;
+        font-weight: bold;
+        direction: ltr;
+        white-space: nowrap;
+    }
+
+    #bankReconciliationArea table.dataTable tbody tr.selected .br-credit,
+    #bankReconciliationArea table.dataTable tbody tr.selected .br-debit {
+        color: #B0CB1F;
+    }
+
+    #bankReconciliationArea .br-status {
+        display: inline-block;
+        min-width: 78px;
+        padding: 3px 5px;
+        border-radius: 2px;
+        font-size: 9px;
+        white-space: nowrap;
+    }
+
+    #bankReconciliationArea .br-status-matched {
+        background-color: rgba(176, 203, 31, .2);
+        color: #263963;
+    }
+
+    #bankReconciliationArea .br-status-partial {
+        background-color: rgba(38, 57, 99, .12);
+        color: #263963;
+    }
+
+    #bankReconciliationArea .br-status-unmatched {
+        background-color: rgba(139, 48, 48, .1);
+        color: #8b3030;
+    }
+
+    #bankReconciliationArea table.dataTable tbody tr.selected .br-status-matched,
+    #bankReconciliationArea table.dataTable tbody tr.selected .br-status-partial,
+    #bankReconciliationArea table.dataTable tbody tr.selected .br-status-unmatched {
+        background-color: rgba(255, 255, 255, .15);
+        color: #fff;
+    }
+
+    #bankReconciliationArea .dataTables_wrapper .dataTables_processing {
+        top: 50%;
+        left: 50%;
+        width: 180px;
+        margin-left: -90px;
+        padding: 8px;
+        background-color: #1c2a48 !important;
+        color: #fff !important;
+        border: 0;
+        border-radius: 2px;
+        font-size: 11px;
+        z-index: 1000;
+    }
+
+    #bankReconciliationArea .dataTables_wrapper .dataTables_info {
+        float: right;
+        color: #777;
+        font-size: 10px;
+        padding-top: 7px;
+    }
+
+    #bankReconciliationArea .dataTables_wrapper .dataTables_paginate {
+        float: left;
+        padding-top: 3px;
+    }
+
+        #bankReconciliationArea .dataTables_wrapper .dataTables_paginate .paginate_button {
+            min-width: 28px;
+            padding: .2rem .45rem;
+            margin-right: 2px;
+            border: 1px solid transparent;
+            border-radius: 2px;
+            font-size: 11px;
+            color: #263963 !important;
+        }
+
+            #bankReconciliationArea .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+                background: #B0CB1F !important;
+                border-color: #B0CB1F !important;
+                color: #1f2f52 !important;
+            }
+
+            #bankReconciliationArea .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+            #bankReconciliationArea .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+                background: #1f2f52 !important;
+                border-color: #1f2f52 !important;
+                color: #B0CB1F !important;
+            }
+
+            #bankReconciliationArea .dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
+            #bankReconciliationArea .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover {
+                background: transparent !important;
+                border-color: transparent !important;
+                color: #aaa !important;
+            }
+
+    #bankReconciliationArea .dataTables_wrapper .dataTables_length {
+        display: none;
+    }
+
+    #bankReconciliationArea .dataTables_wrapper .dataTables_filter {
+        display: none;
+    }
+
+    #bankReconciliationArea .br-match-card {
+        border: 1px solid rgba(38, 57, 99, .18);
+    }
+
+    #bankReconciliationArea .br-match-score {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #777;
+        font-size: 10px;
+    }
+
+    #bankReconciliationArea #matchScore {
+        min-width: 42px;
+        text-align: center;
+        padding: 3px 8px;
+        background-color: #1f2f52;
+        color: #B0CB1F;
+        font-weight: bold;
+    }
+
+    #bankReconciliationArea .br-match-actions {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 5px;
+    }
+
+        #bankReconciliationArea .br-match-actions .btn {
+            min-width: 105px;
+            font-size: 11px;
+            padding: .35rem .8rem;
+        }
+
+    #bankReconciliationArea .br-candidates-card {
+        border: 1px solid rgba(38, 57, 99, .15);
+    }
+
+        #bankReconciliationArea .br-candidates-card .card-header .badge {
+            font-size: 10px;
+        }
+
+    #bankReconciliationArea #accountingCandidates .br-description {
+        max-width: 220px;
+    }
+
+    #bankReconciliationArea .btn:disabled {
+        cursor: not-allowed;
+        opacity: .55;
+    }
+
+    #bankReconciliationArea .bg-charkheh2 {
+        background-color: #1f2f52 !important;
+    }
+
+    #bankReconciliationArea .color-charkheh1 {
+        color: #B0CB1F !important;
+    }
+
+@media (max-width: 991px) {
+
+    #bankReconciliationArea .br-transaction-tools {
+        margin-top: 5px;
+    }
+
+    #bankReconciliationArea .br-search {
+        width: 150px;
+    }
+
+    #bankReconciliationArea .br-description {
+        max-width: 220px;
+    }
+
+    #bankReconciliationArea .dataTables_wrapper .dataTables_info {
+        float: none;
+        text-align: center;
+    }
+
+    #bankReconciliationArea .dataTables_wrapper .dataTables_paginate {
+        float: none;
+        text-align: center;
+    }
+}
+
+@media (max-width: 767px) {
+
+    #bankReconciliationArea .br-tabs .nav-link {
+        padding: .4rem .45rem;
+        font-size: 10px;
+    }
+
+    #bankReconciliationArea .br-transaction-tools {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    #bankReconciliationArea .br-search {
+        width: 160px;
+    }
+
+    #bankReconciliationArea .br-match-actions {
+        flex-wrap: wrap;
+    }
+
+        #bankReconciliationArea .br-match-actions .btn {
+            min-width: 100px;
+        }
+
+    #bankReconciliationArea .dataTables_wrapper table.dataTable thead th,
+    #bankReconciliationArea .dataTables_wrapper table.dataTable tbody td {
+        white-space: nowrap;
+    }
+}
+
+@media (max-width: 575px) {
+
+    #bankReconciliationArea .br-transaction-tools {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    #bankReconciliationArea .br-search {
+        width: 100%;
+    }
+
+    #bankReconciliationArea .br-section-title {
+        margin-top: 3px;
+    }
+
+    #bankReconciliationArea .br-match-actions .btn {
+        width: 100%;
+    }
+}

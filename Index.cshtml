@@ -1,0 +1,678 @@
+﻿@using System.Threading
+
+@{
+    ViewBag.Title = "مغایرت بانکی";
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+}
+
+@functions{
+    public string TokenHeaderValue()
+    {
+        string cookieToken, formToken;
+        AntiForgery.GetTokens(null, out cookieToken, out formToken);
+        return cookieToken + ":" + formToken;
+    }
+}
+
+<link href="~/Content/vendors/select2/dist/css/select2.min.css?v=@(ViewContext.Controller.GetType().Assembly.GetName().Version)" rel="stylesheet" />
+<link href="~/Content/Customer/Financial/BankReconciliation.css?v=@(ViewContext.Controller.GetType().Assembly.GetName().Version)" rel="stylesheet" />
+
+<input type="hidden" id="forgeryToken" value="@TokenHeaderValue()" />
+
+<div class="row" id="bankReconciliationArea">
+    <div class="col-12">
+
+        <div class="card br-card">
+
+            <div class="card-header bg-white border-charkheh2 d-flex justify-content-between align-items-center py-1">
+
+                <h6 class="m-0 p-0 color-charkheh2 font-weight-bold">
+                    <i class="fas fa-university ml-1"></i>
+                    مغایرت بانکی
+                </h6>
+
+                <div class="br-header-actions">
+
+                    <button type="button"
+                            id="btnRefresh"
+                            title="تازه‌سازی"
+                            class="btn bg-charkheh2-lighten color-charkheh1 pt-1 pb-0 px-2">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+
+                    <button type="button"
+                            id="btnFinalize"
+                            title="نهایی‌سازی"
+                            class="btn bg-charkheh2-lighten color-charkheh1 pt-1 pb-0 px-2">
+                        <i class="fas fa-check"></i>
+                    </button>
+
+                </div>
+
+            </div>
+
+            <div class="card-body py-1">
+
+                <div class="card br-filter-card">
+
+                    <div class="card-body py-2">
+
+                        <div class="row align-items-end">
+
+                            <div class="col-lg-4 col-md-6 col-12">
+
+                                <label for="BankAccountId"
+                                       class="select2-label w-100">
+
+                                    حساب بانکی
+
+                                    <select id="BankAccountId"
+                                            class="form-control">
+                                    </select>
+
+                                </label>
+
+                            </div>
+
+                            <div class="col-lg-3 col-md-3 col-6">
+
+                                <div class="md-form mb-0">
+
+                                    <input type="text"
+                                           id="FromDate"
+                                           class="form-control"
+                                           autocomplete="off">
+
+                                    <label for="FromDate">
+                                        از تاریخ
+                                    </label>
+
+                                </div>
+
+                            </div>
+
+                            <div class="col-lg-3 col-md-3 col-6">
+
+                                <div class="md-form mb-0">
+
+                                    <input type="text"
+                                           id="ToDate"
+                                           class="form-control"
+                                           autocomplete="off">
+
+                                    <label for="ToDate">
+                                        تا تاریخ
+                                    </label>
+
+                                </div>
+
+                            </div>
+
+                            <div class="col-lg-2 col-12 mt-lg-0 mt-2">
+
+                                <button type="button"
+                                        id="btnLoad"
+                                        class="btn btn-charkheh1 w-100 py-2">
+
+                                    <i class="fas fa-search ml-1"></i>
+                                    نمایش
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="row mt-2">
+
+                    <div class="col-lg col-md-4 col-6">
+
+                        <div class="card br-summary-card">
+
+                            <div class="card-body py-2">
+
+                                <div class="br-summary-icon">
+                                    <i class="fas fa-list"></i>
+                                </div>
+
+                                <div class="br-summary-content">
+
+                                    <div class="br-summary-label">
+                                        کل تراکنش‌ها
+                                    </div>
+
+                                    <div class="br-summary-value"
+                                         id="summaryTotal">
+                                        0
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-lg col-md-4 col-6">
+
+                        <div class="card br-summary-card">
+
+                            <div class="card-body py-2">
+
+                                <div class="br-summary-icon">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+
+                                <div class="br-summary-content">
+
+                                    <div class="br-summary-label">
+                                        تطبیق شده
+                                    </div>
+
+                                    <div class="br-summary-value"
+                                         id="summaryMatched">
+                                        0
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-lg col-md-4 col-6">
+
+                        <div class="card br-summary-card">
+
+                            <div class="card-body py-2">
+
+                                <div class="br-summary-icon">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                </div>
+
+                                <div class="br-summary-content">
+
+                                    <div class="br-summary-label">
+                                        نیاز به بررسی
+                                    </div>
+
+                                    <div class="br-summary-value"
+                                         id="summaryPartial">
+                                        0
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-lg col-md-4 col-6">
+
+                        <div class="card br-summary-card">
+
+                            <div class="card-body py-2">
+
+                                <div class="br-summary-icon">
+                                    <i class="fas fa-times-circle"></i>
+                                </div>
+
+                                <div class="br-summary-content">
+
+                                    <div class="br-summary-label">
+                                        عدم تطبیق
+                                    </div>
+
+                                    <div class="br-summary-value"
+                                         id="summaryUnmatched">
+                                        0
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-lg col-md-4 col-6">
+
+                        <div class="card br-summary-card">
+
+                            <div class="card-body py-2">
+
+                                <div class="br-summary-icon">
+                                    <i class="fas fa-coins"></i>
+                                </div>
+
+                                <div class="br-summary-content">
+
+                                    <div class="br-summary-label">
+                                        مانده تطبیق
+                                    </div>
+
+                                    <div class="br-summary-value"
+                                         id="summaryRemaining">
+                                        0
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card br-progress-card mt-2">
+
+                    <div class="card-body py-2">
+
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+
+                            <span class="br-progress-title">
+                                درصد تطبیق
+                            </span>
+
+                            <span class="br-progress-percent"
+                                  id="matchPercentage">
+                                0%
+                            </span>
+
+                        </div>
+
+                        <div class="progress br-progress">
+
+                            <div id="matchProgress"
+                                 class="progress-bar bg-charkheh2"
+                                 role="progressbar"
+                                 style="width:0%">
+                            </div>
+
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-1 br-progress-info">
+
+                            <span id="matchProgressText">
+                                0 از 0 تراکنش تطبیق شده
+                            </span>
+
+                            <span id="remainingText">
+                                0 مورد باقی‌مانده
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card br-transactions-card mt-2">
+
+                    <div class="card-header bg-white border-charkheh2 d-flex justify-content-between align-items-center py-0">
+
+                        <div class="classic-tabs br-tabs-wrapper">
+
+                            <ul class="nav bg-charkheh2-lighten br-tabs"
+                                role="tablist">
+
+                                <li class="nav-item">
+
+                                    <a class="nav-link br-tab active"
+                                       data-status="all"
+                                       href="javascript:void(0);">
+
+                                        همه
+
+                                        <span id="tabAllCount"
+                                              class="badge br-tab-badge">
+                                            0
+                                        </span>
+
+                                    </a>
+
+                                </li>
+
+                                <li class="nav-item">
+
+                                    <a class="nav-link br-tab"
+                                       data-status="matched"
+                                       href="javascript:void(0);">
+
+                                        تطبیق شده
+
+                                        <span id="tabMatchedCount"
+                                              class="badge br-tab-badge">
+                                            0
+                                        </span>
+
+                                    </a>
+
+                                </li>
+
+                                <li class="nav-item">
+
+                                    <a class="nav-link br-tab"
+                                       data-status="partial"
+                                       href="javascript:void(0);">
+
+                                        نیاز به بررسی
+
+                                        <span id="tabPartialCount"
+                                              class="badge br-tab-badge">
+                                            0
+                                        </span>
+
+                                    </a>
+
+                                </li>
+
+                                <li class="nav-item">
+
+                                    <a class="nav-link br-tab"
+                                       data-status="unmatched"
+                                       href="javascript:void(0);">
+
+                                        عدم تطبیق
+
+                                        <span id="tabUnmatchedCount"
+                                              class="badge br-tab-badge">
+                                            0
+                                        </span>
+
+                                    </a>
+
+                                </li>
+
+                            </ul>
+
+                        </div>
+
+                        <div class="br-transaction-tools">
+
+                            <div class="input-group br-search">
+
+                                <input type="text"
+                                       id="txtSearch"
+                                       class="form-control"
+                                       placeholder="جستجو..." />
+
+                                <div class="input-group-append">
+
+                                    <span class="input-group-text">
+                                        <i class="fas fa-search"></i>
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                            <button type="button"
+                                    id="btnAutoMatch"
+                                    class="btn bg-charkheh2-lighten color-charkheh1">
+
+                                <i class="fas fa-magic ml-1"></i>
+                                تطبیق خودکار
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <div class="card-body py-1">
+
+                        <div class="br-section-title">
+
+                            <div>
+                                <i class="fas fa-university ml-1"></i>
+                                تراکنش‌های بانکی
+                            </div>
+
+                            <span id="bankCount"
+                                  class="badge bg-charkheh2 color-white">
+                                0
+                            </span>
+
+                        </div>
+
+                        <div class="br-table-container">
+
+                            <table id="bankTransactions"
+                                   class="table table-hover table-striped table-bordered w-100">
+
+                                <thead>
+
+                                    <tr>
+
+                                        <th>
+                                            ردیف
+                                        </th>
+
+                                        <th>
+                                            تاریخ
+                                        </th>
+
+                                        <th>
+                                            شرح
+                                        </th>
+
+                                        <th>
+                                            پیگیری
+                                        </th>
+
+                                        <th>
+                                            مبلغ
+                                        </th>
+
+                                        <th>
+                                            مانده حساب
+                                        </th>
+
+                                        <th>
+                                            مانده تطبیق
+                                        </th>
+
+                                        <th>
+                                            وضعیت
+                                        </th>
+
+                                    </tr>
+
+                                </thead>
+
+                                <tbody>
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card br-match-card mt-2">
+
+                    <div class="card-header bg-white border-charkheh2 d-flex justify-content-between align-items-center py-1">
+
+                        <h6 class="m-0 p-0 color-charkheh2 font-weight-bold">
+
+                            <i class="fas fa-random ml-1"></i>
+                            عملیات تطبیق
+
+                        </h6>
+
+                        <div class="br-match-score">
+
+                            <span id="matchScoreLabel">
+                                میزان تطابق
+                            </span>
+
+                            <strong id="matchScore">
+                                -
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                    <div class="card-body py-1">
+
+                        <div class="br-match-actions">
+
+                            <button type="button"
+                                    id="btnMatch"
+                                    class="btn btn-charkheh1"
+                                    disabled>
+
+                                <i class="fas fa-link ml-1"></i>
+                                تطبیق
+
+                            </button>
+
+                            <button type="button"
+                                    id="btnGroupMatch"
+                                    class="btn bg-charkheh2-lighten color-charkheh1"
+                                    disabled>
+
+                                <i class="fas fa-object-group ml-1"></i>
+                                تطبیق گروهی
+
+                            </button>
+
+                            <button type="button"
+                                    id="btnOtherMatch"
+                                    class="btn btn-light"
+                                    disabled>
+
+                                <i class="fas fa-search ml-1"></i>
+                                سایر موارد
+
+                            </button>
+
+                            <button type="button"
+                                    id="btnRemoveMatch"
+                                    class="btn btn-light"
+                                    disabled>
+
+                                <i class="fas fa-unlink ml-1"></i>
+                                حذف تطبیق
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card br-candidates-card mt-2">
+
+                    <div class="card-header bg-white border-charkheh2 d-flex justify-content-between align-items-center py-1">
+
+                        <h6 class="m-0 p-0 color-charkheh2 font-weight-bold">
+
+                            <i class="fas fa-file-invoice-dollar ml-1"></i>
+                            اسناد مالی قابل تطبیق
+
+                        </h6>
+
+                        <span id="candidateCount"
+                              class="badge bg-charkheh2 color-white">
+                            0
+                        </span>
+
+                    </div>
+
+                    <div class="card-body py-1">
+
+                        <div class="br-table-container">
+
+                            <table id="accountingCandidates"
+                                   class="table table-hover table-striped table-bordered w-100">
+
+                                <thead>
+
+                                    <tr>
+
+                                        <th>
+                                            ردیف
+                                        </th>
+
+                                        <th>
+                                            تاریخ
+                                        </th>
+
+                                        <th>
+                                            حساب
+                                        </th>
+
+                                        <th>
+                                            شرح
+                                        </th>
+
+                                        <th>
+                                            پیگیری
+                                        </th>
+
+                                        <th>
+                                            مبلغ
+                                        </th>
+
+                                        <th>
+                                            مانده
+                                        </th>
+
+                                        <th>
+                                            اختلاف مبلغ
+                                        </th>
+
+                                    </tr>
+
+                                </thead>
+
+                                <tbody>
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="~/Scripts/vendors/select2/dist/js/select2.full.min.js?v=@(ViewContext.Controller.GetType().Assembly.GetName().Version)"></script>
+<script src="~/Scripts/vendors/select2/dist/js/select2.@(Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName).js?v=@(ViewContext.Controller.GetType().Assembly.GetName().Version)"></script>
+
+
+
+<script src="~/Scripts/DataTables/media/js/jquery.dataTables.min.js?v=@(ViewContext.Controller.GetType().Assembly.GetName().Version)"></script>
+<script src="~/Scripts/DataTables/extensions/Select/js/dataTables.select.min.js?v=@(ViewContext.Controller.GetType().Assembly.GetName().Version)"></script>
+<script src="~/Scripts/DataTables/extensions/Buttons/js/dataTables.buttons.min.js?v=@(ViewContext.Controller.GetType().Assembly.GetName().Version)"></script>
+<script src="~/Scripts/DataTables/extensions/Buttons/js/buttons.print.min.js?v=@(ViewContext.Controller.GetType().Assembly.GetName().Version)"></script>
+<script src="~/Scripts/DataTables/extensions/Buttons/js/buttons.html5.min.js?v=@(ViewContext.Controller.GetType().Assembly.GetName().Version)"></script>
+<script src="~/Scripts/DataTables/dataTables-@(Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName).js?v=@(ViewContext.Controller.GetType().Assembly.GetName().Version)"></script>
+<script src="~/Scripts/DataTables/JSZip-2.5.0/jszip.min.js?v=@(ViewContext.Controller.GetType().Assembly.GetName().Version)"></script>
+
+
+<script src="~/Scripts/Customer/Financial/BankReconciliation.js?v=@(ViewContext.Controller.GetType().Assembly.GetName().Version)"></script>
