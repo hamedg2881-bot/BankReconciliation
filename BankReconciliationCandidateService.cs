@@ -602,14 +602,10 @@ namespace CDS.BIMS.Application.Service.Financial
             AccountingDocDetail detail)
         {
             var depositSlip =
-                detail.DepositSlip != null &&
-                !string.IsNullOrWhiteSpace(
-                    detail.DepositSlip.Number);
+                detail.DepositSlip != null;
 
             var cheque =
-                detail.Cheque != null &&
-                !string.IsNullOrWhiteSpace(
-                    detail.Cheque.Serial);
+                detail.Cheque != null;
 
             if (depositSlip && cheque)
                 return "DepositSlip, Cheque";
