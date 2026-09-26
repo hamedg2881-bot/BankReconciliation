@@ -173,19 +173,26 @@
     }
 
         #bankReconciliationArea .br-tabs .nav-link {
-            color: #263963;
+            color: #263963 !important;
+            background-color: #f5f6f8;
             font-size: 11px;
+            font-weight: 600;
             padding: .45rem .8rem;
+            border: 1px solid #d8dce3;
+            border-bottom: 0;
             border-radius: 0;
+            opacity: 1;
         }
 
             #bankReconciliationArea .br-tabs .nav-link:hover {
-                background-color: rgba(38, 57, 99, .08);
+                background-color: rgba(38, 57, 99, .12);
+                color: #1f2f52 !important;
             }
 
             #bankReconciliationArea .br-tabs .nav-link.active {
                 background-color: #1f2f52;
-                color: #B0CB1F;
+                color: #B0CB1F !important;
+                border-color: #1f2f52;
             }
 
     #bankReconciliationArea .br-tab-badge {
