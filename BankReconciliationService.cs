@@ -71,6 +71,16 @@ namespace CDS.BIMS.Application.Service.Financial
                     return Error<BankReconciliationDto>(
                         "برای این حساب بانکی مرکز تعریف نشده است و امکان مغایرت‌گیری وجود ندارد.");
 
+                var existingReconciliation =
+                    _bankReconciliationRepository.Query
+                        .FirstOrDefault(x =>
+                            x.BankAccountId == request.BankAccountId &&
+                            x.FromDate == fromDate &&
+                            x.ToDate == toDate);
+
+                if (existingReconciliation != null)
+                    return Get(existingReconciliation.Id);
+
                 var overlapExists = _bankReconciliationRepository.Query.Any(x =>
                     x.BankAccountId == request.BankAccountId &&
                     x.FromDate <= toDate &&
