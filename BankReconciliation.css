@@ -575,16 +575,18 @@
     }
 
     #bankReconciliationArea .br-workspace {
-        display: grid;
-        grid-template-columns: minmax(0, 1.55fr) minmax(360px, 1fr);
-        gap: 6px;
-        align-items: start;
+        display: block;
         margin-top: 8px;
     }
 
     #bankReconciliationArea .br-bank-pane,
     #bankReconciliationArea .br-match-pane {
         min-width: 0;
+        width: 100%;
+    }
+
+    #bankReconciliationArea .br-match-pane {
+        margin-top: 8px;
     }
 
     #bankReconciliationArea .br-bank-pane .br-transactions-card,
