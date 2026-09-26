@@ -512,14 +512,38 @@
         }
 
     #bankReconciliationArea #accountingCandidates {
-        table-layout: fixed;
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        table-layout: fixed !important;
+        box-sizing: border-box;
+    }
+
+    #bankReconciliationArea #accountingCandidates col {
+        width: auto;
     }
 
     #bankReconciliationArea #accountingCandidates thead th,
     #bankReconciliationArea #accountingCandidates tbody td {
+        min-width: 0 !important;
+        max-width: 100%;
         white-space: normal;
+        overflow: hidden;
         overflow-wrap: anywhere;
         word-break: break-word;
+    }
+
+    #bankReconciliationArea #accountingCandidates_wrapper,
+    #bankReconciliationArea #accountingCandidates_wrapper .dataTables_scroll,
+    #bankReconciliationArea #accountingCandidates_wrapper .dataTables_scrollHead,
+    #bankReconciliationArea #accountingCandidates_wrapper .dataTables_scrollBody {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    #bankReconciliationArea #accountingCandidates_wrapper .dataTables_scrollBody {
+        overflow-x: hidden !important;
     }
 
     #bankReconciliationArea #accountingCandidates .br-description {
