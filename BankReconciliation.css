@@ -91,6 +91,7 @@
 
     #bankReconciliationArea .br-progress-card {
         border: 1px solid rgba(38, 57, 99, .15);
+        margin-bottom: 8px;
     }
 
     #bankReconciliationArea .br-progress-title {
