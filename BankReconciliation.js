@@ -749,6 +749,30 @@
 
             });
 
+            self.state.bankTable.on("deselect.dt", function (e, dt, type) {
+
+                if (type !== "row") {
+                    return;
+                }
+
+                if (!dt.rows({ selected: true }).any()) {
+                    self.clearBankTransactionSelection();
+                }
+
+            });
+
+            self.state.candidateTable.on("deselect.dt", function (e, dt, type) {
+
+                if (type !== "row") {
+                    return;
+                }
+
+                if (!dt.rows({ selected: true }).any()) {
+                    self.clearAccountingDetailSelection();
+                }
+
+            });
+
             $("#txtSearch").on("keyup", function () {
 
                 clearTimeout(self.searchTimer);
@@ -841,6 +865,43 @@
                 self.reloadCandidateTable();
 
             });
+
+        },
+
+        clearBankTransactionSelection: function () {
+
+            this.state.selectedBankTransactionId = null;
+            this.state.selectedBankTransactionIds = [];
+            this.state.selectedAccountingDetailId = null;
+            this.state.selectedAccountingDetailIds = [];
+            this.state.candidateMode = 1;
+
+            if (this.state.candidateTable) {
+                this.state.candidateTable.rows().deselect();
+            }
+
+            $("#btnMatch").prop("disabled", true);
+            $("#btnOtherMatch").prop("disabled", true);
+            $("#btnRemoveMatch").prop("disabled", true);
+            $("#matchScore").text("-");
+            $("#matchScoreLabel").text("میزان تطابق");
+            $("#selectedTransactionDate").text("-");
+            $("#selectedTransactionDescription").text("تراکنشی انتخاب نشده است");
+            $("#selectedTransactionAmount").text("-");
+            $("#selectedTransactionRemaining").text("-");
+
+            this.reloadCandidateTable();
+
+        },
+
+        clearAccountingDetailSelection: function () {
+
+            this.state.selectedAccountingDetailId = null;
+            this.state.selectedAccountingDetailIds = [];
+
+            $("#btnMatch").prop("disabled", true);
+            $("#matchScore").text("-");
+            $("#matchScoreLabel").text("میزان تطابق");
 
         },
 
