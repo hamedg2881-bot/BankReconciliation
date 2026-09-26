@@ -764,7 +764,7 @@
 
             $("#btnOtherMatch").on("click", function () {
 
-                self.state.candidateMode = 2;
+                self.state.candidateMode = 1;
 
                 self.reloadCandidateTable();
 
