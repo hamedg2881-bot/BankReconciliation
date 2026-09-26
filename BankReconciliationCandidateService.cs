@@ -266,6 +266,9 @@ namespace CDS.BIMS.Application.Service.Financial
                     {
                         Detail = detail,
 
+                        AccountingDocDate =
+                            detail.AccountingDoc.AccountingDocDate,
+
                         MatchedAmount =
                             matchSum == null
                                 ? 0
@@ -306,8 +309,7 @@ namespace CDS.BIMS.Application.Service.Financial
                             var dateDifference =
                                 Math.Abs(
                                     (
-                                        detail.AccountingDoc
-                                            .AccountingDocDate.Date
+                                        x.AccountingDocDate.Date
                                         -
                                         transaction
                                             .TransactionDate.Date
