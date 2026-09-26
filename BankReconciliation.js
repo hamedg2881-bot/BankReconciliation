@@ -100,14 +100,13 @@
                 lengthChange: false,
                 pageLength: this.state.pageSize,
                 pagingType: "simple_numbers",
+                dom: "rt<'row'<'col'l><'col'p><'col'i>>",
                 select: {
-                    style: "single"
+                    style: "single",
+                    selector: 'td:not(:last-child)'
                 },
-                language: {
-                    url: "/Scripts/DataTables/dataTables-" +
-                        (typeof pageLanguageDictionary !== "undefined" ? "fa" : "fa") +
-                        ".js"
-                },
+                rowId: "Id",
+                language: dataTablesCurrentLanguage,
                 ajax: function (data, callback) {
 
                     if (!self.state.reconciliationId) {
@@ -135,6 +134,9 @@
                         url: "/BankReconciliation/GetPage",
 
                         type: "POST",
+                        headers: {
+                            "RequestVerificationToken": $("#forgeryToken").val()
+                        },
 
                         data: JSON.stringify({
 
@@ -368,6 +370,16 @@
 
             });
 
+            this.state.bankTable.on("draw.dt", function () {
+                var pageInfo = self.state.bankTable.page.info();
+                self.state.bankTable
+                    .column(0, { page: "current" })
+                    .nodes()
+                    .each(function (cell, i) {
+                        cell.innerHTML = i + 1 + pageInfo.start;
+                    });
+            });
+
             this.state.candidateTable =
                 $("#accountingCandidates").DataTable({
 
@@ -379,9 +391,13 @@
                     pageLength: 30,
                     pagingType: "simple_numbers",
 
+                    dom: "rt<'row'<'col'l><'col'p><'col'i>>",
                     select: {
-                        style: "single"
+                        style: "single",
+                        selector: 'td:not(:last-child)'
                     },
+                    rowId: "AccountingDocDetailId",
+                    language: dataTablesCurrentLanguage,
 
                     ajax: function (data, callback) {
 
@@ -411,6 +427,9 @@
                                 "/BankReconciliation/GetCandidates",
 
                             type: "POST",
+                            headers: {
+                                "RequestVerificationToken": $("#forgeryToken").val()
+                            },
 
                             data: JSON.stringify({
 
@@ -614,6 +633,16 @@
                     }
 
                 });
+
+            this.state.candidateTable.on("draw.dt", function () {
+                var pageInfo = self.state.candidateTable.page.info();
+                self.state.candidateTable
+                    .column(0, { page: "current" })
+                    .nodes()
+                    .each(function (cell, i) {
+                        cell.innerHTML = i + 1 + pageInfo.start;
+                    });
+            });
 
         },
 
