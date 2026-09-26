@@ -542,7 +542,7 @@
                         {
                             data: "AccountingDocDate",
                             className: "text-center",
-                            width: "10%",
+                            width: "8%",
                             render: function (data) {
 
                                 return self.escapeHtml(
@@ -553,8 +553,19 @@
                         },
 
                         {
+                            data: "AccountingDocId",
+                            className: "text-center",
+                            width: "8%",
+                            render: function (data) {
+
+                                return self.formatNumber(data);
+
+                            }
+                        },
+
+                        {
                             data: "AccountTitle",
-                            width: "16%",
+                            width: "14%",
                             render: function (data) {
 
                                 return self.escapeHtml(
@@ -579,9 +590,32 @@
                         },
 
                         {
+                            data: "TrackingSource",
+                            className: "text-center",
+                            width: "9%",
+                            render: function (data) {
+
+                                if (data === "DepositSlip") {
+                                    return "فیش واریز";
+                                }
+
+                                if (data === "Cheque") {
+                                    return "چک";
+                                }
+
+                                if (data === "DepositSlip, Cheque") {
+                                    return "فیش واریز / چک";
+                                }
+
+                                return "-";
+
+                            }
+                        },
+
+                        {
                             data: "TrackingNumber",
                             className: "text-center",
-                            width: "12%",
+                            width: "11%",
                             render: function (data) {
 
                                 return self.escapeHtml(
@@ -594,7 +628,7 @@
                         {
                             data: "Amount",
                             className: "text-left",
-                            width: "12%",
+                            width: "11%",
                             render: function (data) {
 
                                 return self.formatAmount(data);
