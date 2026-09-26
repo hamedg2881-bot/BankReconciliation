@@ -32,6 +32,9 @@ namespace CDS.BIMS.Application.Service.Financial
         private readonly IAccountingDocDetailRepository
             _accountingDocDetailRepository;
 
+        private readonly IAccountingDocRepository
+            _accountingDocRepository;
+
         private readonly IRepository<AccountingDoc>
             _accountingDocRepository;
 
@@ -44,7 +47,7 @@ namespace CDS.BIMS.Application.Service.Financial
             IRepository<BankAccount> bankAccountRepository,
             IRepository<BankReconciliationMatch> matchRepository,
             IAccountingDocDetailRepository accountingDocDetailRepository,
-            IRepository<AccountingDoc> accountingDocRepository,
+            IAccountingDocRepository accountingDocRepository,
             IRepository<Setting> settingRepository)
         {
             _bankReconciliationRepository = bankReconciliationRepository;
