@@ -156,9 +156,17 @@ namespace CDS.BIMS.Application.Service.Financial
                         MatchedAmount = g.Sum(x => x.MatchedAmount)
                     };
 
+                var dateTolerance = filter.DateTolerance <= 0 ? 2 : filter.DateTolerance;
+
+                if (dateTolerance != 1 && dateTolerance != 2)
+                {
+                    return Error<BankReconciliationCandidateResultDto>(
+                        "اختلاف تاریخ انتخاب شده نامعتبر است.");
+                }
+
                 var transactionDate = transaction.TransactionDate.Date;
-                var candidateFromDate = transactionDate.AddDays(-2);
-                var candidateToDate = transactionDate.AddDays(3);
+                var candidateFromDate = transactionDate.AddDays(-dateTolerance);
+                var candidateToDate = transactionDate.AddDays(dateTolerance + 1);
 
                 var accountingDocDates = _accountingDocRepository.Query
                     .Where(x =>
@@ -177,6 +185,7 @@ namespace CDS.BIMS.Application.Service.Financial
 
                 var details = _accountingDocDetailRepository.Query
                     .Include(x => x.Account)
+                    .Include(x => x.AccountingDocDetailCenters.Select(y => y.Center))
                     .Where(x =>
                         accountingDocIds.Contains(x.AccountingDocId) &&
                         allowedAccountIds.Contains(x.AccountId) &&
@@ -253,7 +262,7 @@ namespace CDS.BIMS.Application.Service.Financial
                             (x.AccountingDocDate.Date -
                              transaction.TransactionDate.Date).Days);
 
-                        if (dateDifference > 2)
+                        if (dateDifference > dateTolerance)
                             return null;
 
                         var trackingNumber = GetTrackingNumber(
@@ -278,8 +287,17 @@ namespace CDS.BIMS.Application.Service.Financial
                             AccountingDocDate = x.AccountingDocDate,
                             AccountId = detail.AccountId,
                             AccountTitle = detail.Account != null ? detail.Account.Title : null,
-                            CenterId = centerId,
-                            CenterTitle = bankAccount.Center != null ? bankAccount.Center.Title : null,
+                            CenterId = detail.AccountingDocDetailCenters
+                                .Select(y => (int?)y.CenterId)
+                                .FirstOrDefault() ?? centerId,
+                            CenterTitle = string.Join(
+                                "، ",
+                                detail.AccountingDocDetailCenters
+                                    .Where(y => y.Center != null)
+                                    .Select(y => y.Center.Title)
+                                    .Where(y => !string.IsNullOrWhiteSpace(y))
+                                    .Distinct()
+                                    .ToList()),
                             Credit = detail.Credit,
                             Debit = detail.Debit,
                             Amount = amount,
