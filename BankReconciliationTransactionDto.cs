@@ -153,6 +153,8 @@ namespace CDS.BIMS.Application.Dto.Financial
 
         public bool? TrackingMatched { get; set; }
 
+        public int DateTolerance { get; set; }
+
         public BankReconciliationCandidateMode Mode { get; set; }
 
         public int Page { get; set; }
