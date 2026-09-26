@@ -32,6 +32,9 @@ namespace CDS.BIMS.Application.Service.Financial
         private readonly IAccountingDocDetailRepository
             _accountingDocDetailRepository;
 
+        private readonly IRepository<AccountingDoc>
+            _accountingDocRepository;
+
         private readonly IRepository<Setting>
             _settingRepository;
 
@@ -41,25 +44,22 @@ namespace CDS.BIMS.Application.Service.Financial
             IRepository<BankAccount> bankAccountRepository,
             IRepository<BankReconciliationMatch> matchRepository,
             IAccountingDocDetailRepository accountingDocDetailRepository,
+            IRepository<AccountingDoc> accountingDocRepository,
             IRepository<Setting> settingRepository)
         {
-            _bankReconciliationRepository =
-                bankReconciliationRepository;
+            _bankReconciliationRepository = bankReconciliationRepository;
 
-            _bankTransactionRepository =
-                bankTransactionRepository;
+            _bankTransactionRepository = bankTransactionRepository;
 
-            _bankAccountRepository =
-                bankAccountRepository;
+            _bankAccountRepository = bankAccountRepository;
 
-            _matchRepository =
-                matchRepository;
+            _matchRepository = matchRepository;
 
-            _accountingDocDetailRepository =
-                accountingDocDetailRepository;
+            _accountingDocDetailRepository = accountingDocDetailRepository;
 
-            _settingRepository =
-                settingRepository;
+            _accountingDocRepository = accountingDocRepository;
+
+            _settingRepository = settingRepository;
         }
 
         public CDSResponse<BankReconciliationCandidateResultDto>
@@ -232,21 +232,25 @@ namespace CDS.BIMS.Application.Service.Financial
                 var detailsQuery =
                     from detail in
                         _accountingDocDetailRepository.Query
-                            .Include(x => x.AccountingDoc)
                             .Include(x => x.Account)
                             .Include(x => x.DepositSlip)
                             .Include(x => x.Cheque)
+
+                    join accountingDoc in
+                        _accountingDocRepository.Query
+                        on detail.AccountingDocId equals
+                        accountingDoc.Id
 
                     where
                         allowedAccountIds.Contains(
                             detail.AccountId)
 
                         &&
-                        detail.AccountingDoc.AccountingDocDate
+                        accountingDoc.AccountingDocDate
                         >= candidateFromDate
 
                         &&
-                        detail.AccountingDoc.AccountingDocDate
+                        accountingDoc.AccountingDocDate
                         < candidateToDate
 
                         &&
@@ -267,7 +271,7 @@ namespace CDS.BIMS.Application.Service.Financial
                         Detail = detail,
 
                         AccountingDocDate =
-                            detail.AccountingDoc.AccountingDocDate,
+                            accountingDoc.AccountingDocDate,
 
                         MatchedAmount =
                             matchSum == null
@@ -352,8 +356,7 @@ namespace CDS.BIMS.Application.Service.Financial
                                     detail.AccountingDocId,
 
                                 AccountingDocDate =
-                                    detail.AccountingDoc
-                                        .AccountingDocDate,
+                                    x.AccountingDocDate,
 
                                 AccountId =
                                     detail.AccountId,
