@@ -15,7 +15,7 @@
             selectedBankTransactionIds: [],
             selectedAccountingDetailIds: [],
             candidateMode: 1,
-            dateTolerance: 2,
+            dateTolerance: 0,
             totalCount: 0,
             totalPages: 0,
             reconciliationState: 0,
@@ -469,7 +469,9 @@
                                     TrackingMatched: null,
 
                                     DateTolerance:
-                                        Number(self.state.dateTolerance) || 2,
+                                        Number.isNaN(Number(self.state.dateTolerance))
+                                            ? 0
+                                            : Number(self.state.dateTolerance),
 
                                     Mode:
                                         Number(self.state.candidateMode) || 1,
@@ -590,31 +592,52 @@
                         {
                             data: "AccountTitle",
                             width: "14%",
-                            render: function (data, type, row) {
+                            render: function (data) {
 
-                                var accountTitle =
-                                    self.escapeHtml(data || "");
+                                return self.escapeHtml(
+                                    data || ""
+                                );
+
+                            }
+                        },
+
+                        {
+                            data: null,
+                            width: "15%",
+                            render: function (data, type, row) {
 
                                 var centerTitle =
                                     self.escapeHtml(row.CenterTitle || "");
 
-                                if (!centerTitle) {
-                                    return accountTitle;
+                                var counterpartCenterTitle =
+                                    self.escapeHtml(row.CounterpartCenterTitle || "");
+
+                                if (!centerTitle && !counterpartCenterTitle) {
+                                    return "-";
                                 }
 
-                                return '<div>' +
-                                    accountTitle +
-                                    '</div>' +
-                                    '<div class="br-account-center">' +
-                                    centerTitle +
-                                    '</div>';
+                                var html = "";
+
+                                if (centerTitle) {
+                                    html += '<div class="br-account-center">' +
+                                        'مرکز حساب: ' + centerTitle +
+                                        "</div>";
+                                }
+
+                                if (counterpartCenterTitle) {
+                                    html += '<div class="br-account-center">' +
+                                        'مرکز طرف دوم: ' + counterpartCenterTitle +
+                                        "</div>";
+                                }
+
+                                return html;
 
                             }
                         },
 
                         {
                             data: "Description",
-                            width: "27%",
+                            width: "24%",
                             render: function (data) {
 
                                 return '<div class="br-description">' +
