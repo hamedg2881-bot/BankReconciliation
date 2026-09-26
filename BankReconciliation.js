@@ -15,6 +15,7 @@
             selectedBankTransactionIds: [],
             selectedAccountingDetailIds: [],
             candidateMode: 1,
+            dateTolerance: 2,
             totalCount: 0,
             totalPages: 0,
             reconciliationState: 0,
@@ -72,6 +73,8 @@
 
         initDates: function () {
 
+            var self = this;
+
             $("#FromDate").MdPersianDateTimePicker({
                 targetTextSelector: "#FromDate",
                 enableTimePicker: false,
@@ -84,6 +87,11 @@
                 enableTimePicker: false,
                 textFormat: "yyyy/MM/dd",
                 isGregorian: false
+            });
+
+            $("#candidateDateTolerance").on("change", function () {
+                self.state.dateTolerance = Number($(this).val()) || 2;
+                self.reloadCandidateTable();
             });
 
         },
@@ -460,6 +468,9 @@
 
                                     TrackingMatched: null,
 
+                                    DateTolerance:
+                                        Number(self.state.dateTolerance) || 2,
+
                                     Mode:
                                         Number(self.state.candidateMode) || 1,
 
@@ -579,11 +590,24 @@
                         {
                             data: "AccountTitle",
                             width: "14%",
-                            render: function (data) {
+                            render: function (data, type, row) {
 
-                                return self.escapeHtml(
-                                    data || ""
-                                );
+                                var accountTitle =
+                                    self.escapeHtml(data || "");
+
+                                var centerTitle =
+                                    self.escapeHtml(row.CenterTitle || "");
+
+                                if (!centerTitle) {
+                                    return accountTitle;
+                                }
+
+                                return '<div>' +
+                                    accountTitle +
+                                    '</div>' +
+                                    '<div class="br-account-center">' +
+                                    centerTitle +
+                                    '</div>';
 
                             }
                         },
