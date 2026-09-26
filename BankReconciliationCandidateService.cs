@@ -218,6 +218,15 @@ namespace CDS.BIMS.Application.Service.Financial
                             g.Sum(x => x.MatchedAmount)
                     };
 
+                var transactionDate =
+                    transaction.TransactionDate.Date;
+
+                var candidateFromDate =
+                    transactionDate.AddDays(-2);
+
+                var candidateToDate =
+                    transactionDate.AddDays(3);
+
                 var detailsQuery =
                     from detail in
                         _accountingDocDetailRepository.Query
@@ -228,11 +237,11 @@ namespace CDS.BIMS.Application.Service.Financial
 
                         &&
                         detail.AccountingDoc.AccountingDocDate
-                        >= transaction.TransactionDate.Date.AddDays(-2)
+                        >= candidateFromDate
 
                         &&
                         detail.AccountingDoc.AccountingDocDate
-                        < transaction.TransactionDate.Date.AddDays(3)
+                        < candidateToDate
 
                         &&
                         detail.AccountingDocDetailCenters
