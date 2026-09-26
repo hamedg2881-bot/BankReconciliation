@@ -390,6 +390,8 @@
                     lengthChange: false,
                     pageLength: 30,
                     pagingType: "simple_numbers",
+                    autoWidth: false,
+                    scrollX: true,
 
                     dom: "rt<'row'<'col'l><'col'p><'col'i>>",
                     select: {
@@ -540,7 +542,7 @@
                         {
                             data: "AccountingDocDate",
                             className: "text-center",
-                            width: "95px",
+                            width: "85px",
                             render: function (data) {
 
                                 return self.escapeHtml(
@@ -552,6 +554,7 @@
 
                         {
                             data: "AccountTitle",
+                            width: "140px",
                             render: function (data) {
 
                                 return self.escapeHtml(
@@ -563,6 +566,7 @@
 
                         {
                             data: "Description",
+                            width: "220px",
                             render: function (data) {
 
                                 return '<div class="br-description">' +
@@ -577,7 +581,7 @@
                         {
                             data: "TrackingNumber",
                             className: "text-center",
-                            width: "130px",
+                            width: "110px",
                             render: function (data) {
 
                                 return self.escapeHtml(
@@ -590,7 +594,7 @@
                         {
                             data: "Amount",
                             className: "text-left",
-                            width: "130px",
+                            width: "110px",
                             render: function (data) {
 
                                 return self.formatAmount(data);
@@ -601,7 +605,7 @@
                         {
                             data: "RemainingAmount",
                             className: "text-left",
-                            width: "130px",
+                            width: "110px",
                             render: function (data) {
 
                                 return self.formatAmount(data);
@@ -612,7 +616,7 @@
                         {
                             data: "AmountDifference",
                             className: "text-left",
-                            width: "120px",
+                            width: "110px",
                             render: function (data) {
 
                                 return self.formatAmount(data);
@@ -964,6 +968,10 @@
             this.state.candidateTable
                 .ajax
                 .reload(null, true);
+
+            this.state.candidateTable
+                .columns
+                .adjust();
 
         },
 
