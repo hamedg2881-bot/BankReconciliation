@@ -206,11 +206,12 @@
 
     #bankReconciliationArea .br-table-container {
         width: 100%;
-        overflow-x: auto;
+        overflow-x: hidden;
     }
 
     #bankReconciliationArea .dataTables_wrapper {
         width: 100%;
+        max-width: 100%;
         font-size: 12px;
     }
 
@@ -220,6 +221,8 @@
 
         #bankReconciliationArea .dataTables_wrapper table.dataTable {
             width: 100% !important;
+            max-width: 100% !important;
+            table-layout: fixed;
             margin: 0 !important;
             border-collapse: collapse !important;
         }
