@@ -826,7 +826,7 @@
             this.state.selectedAccountingDetailIds =
                 [];
 
-            this.state.candidateMode = 0;
+            this.state.candidateMode = 1;
 
             this.state.bankTable
                 .rows()
