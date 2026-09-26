@@ -446,7 +446,7 @@
                                     TrackingMatched: null,
 
                                     Mode:
-                                        self.state.candidateMode,
+                                        Number(self.state.candidateMode) || 1,
 
                                     Page:
                                         page,
