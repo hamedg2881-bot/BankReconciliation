@@ -566,7 +566,7 @@
 
                         {
                             data: "Description",
-                            width: "32%",
+                            width: "27%",
                             render: function (data) {
 
                                 return '<div class="br-description">' +
@@ -594,7 +594,7 @@
                         {
                             data: "Amount",
                             className: "text-left",
-                            width: "14%",
+                            width: "12%",
                             render: function (data) {
 
                                 return self.formatAmount(data);
