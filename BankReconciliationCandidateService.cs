@@ -35,9 +35,6 @@ namespace CDS.BIMS.Application.Service.Financial
         private readonly IAccountingDocRepository
             _accountingDocRepository;
 
-        private readonly IRepository<AccountingDoc>
-            _accountingDocRepository;
-
         private readonly IRepository<Setting>
             _settingRepository;
 
