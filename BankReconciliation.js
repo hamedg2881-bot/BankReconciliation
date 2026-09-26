@@ -7,7 +7,7 @@
         state: {
             reconciliationId: 0,
             page: 1,
-            pageSize: 30,
+            pageSize: 10,
             status: null,
             search: "",
             selectedBankTransactionId: null,
@@ -401,7 +401,7 @@
                     searching: false,
                     ordering: false,
                     lengthChange: false,
-                    pageLength: 30,
+                    pageLength: 10,
                     pagingType: "simple_numbers",
                     autoWidth: false,
                     scrollX: false,
@@ -717,41 +717,37 @@
 
             });
 
-            $("#bankTransactions tbody")
-                .on("click", "tr", function () {
+            self.state.bankTable.on("select.dt", function (e, dt, type, indexes) {
 
-                    var data =
-                        self.state.bankTable
-                            .row(this)
-                            .data();
+                if (type !== "row" || !indexes.length) {
+                    return;
+                }
 
-                    if (!data) {
-                        return;
-                    }
+                var data = dt.row(indexes[0]).data();
 
-                    self.selectBankTransaction(
-                        data.Id
-                    );
+                if (!data) {
+                    return;
+                }
 
-                });
+                self.selectBankTransaction(data.Id);
 
-            $("#accountingCandidates tbody")
-                .on("click", "tr", function () {
+            });
 
-                    var data =
-                        self.state.candidateTable
-                            .row(this)
-                            .data();
+            self.state.candidateTable.on("select.dt", function (e, dt, type, indexes) {
 
-                    if (!data) {
-                        return;
-                    }
+                if (type !== "row" || !indexes.length) {
+                    return;
+                }
 
-                    self.selectAccountingDetail(
-                        data
-                    );
+                var data = dt.row(indexes[0]).data();
 
-                });
+                if (!data) {
+                    return;
+                }
+
+                self.selectAccountingDetail(data);
+
+            });
 
             $("#txtSearch").on("keyup", function () {
 
@@ -867,25 +863,10 @@
 
             this.state.candidateMode = 1;
 
-            this.state.bankTable
-                .rows()
-                .deselect();
-
-            this.state.bankTable
-                .rows()
-                .every(function () {
-
-                    var data = this.data();
-
-                    if (
-                        data &&
-                        Number(data.Id) === Number(id)
-                    ) {
-                        selectedTransaction = data;
-                        this.select();
-                    }
-
-                });
+            selectedTransaction =
+                this.state.bankTable
+                    .row("#" + id)
+                    .data();
 
             if (selectedTransaction) {
 
@@ -935,30 +916,6 @@
                         candidate.AccountingDocDetailId
                     )
                 ];
-
-            this.state.candidateTable
-                .rows()
-                .deselect();
-
-            this.state.candidateTable
-                .rows()
-                .every(function () {
-
-                    var data = this.data();
-
-                    if (
-                        data &&
-                        Number(
-                            data.AccountingDocDetailId
-                        ) ===
-                        Number(
-                            candidate.AccountingDocDetailId
-                        )
-                    ) {
-                        this.select();
-                    }
-
-                });
 
             $("#btnMatch")
                 .prop(
