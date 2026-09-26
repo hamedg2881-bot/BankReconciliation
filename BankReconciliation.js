@@ -1000,6 +1000,10 @@
                 type:
                     "POST",
 
+                headers: {
+                    "RequestVerificationToken": $("#forgeryToken").val()
+                },
+
                 data:
                     JSON.stringify({
 
