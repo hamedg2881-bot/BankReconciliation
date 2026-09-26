@@ -105,6 +105,7 @@ namespace CDS.BIMS.Application.Dto.Financial
 
         public int CenterId { get; set; }
         public string CenterTitle { get; set; }
+        public string CounterpartCenterTitle { get; set; }
 
         public decimal Credit { get; set; }
         public decimal Debit { get; set; }
