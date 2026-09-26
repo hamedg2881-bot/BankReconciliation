@@ -530,7 +530,7 @@
                         {
                             data: null,
                             className: "text-center",
-                            width: "40px",
+                            width: "6%",
                             render: function () {
 
                                 return "";
@@ -541,7 +541,7 @@
                         {
                             data: "AccountingDocDate",
                             className: "text-center",
-                            width: "75px",
+                            width: "10%",
                             render: function (data) {
 
                                 return self.escapeHtml(
@@ -553,7 +553,7 @@
 
                         {
                             data: "AccountTitle",
-                            width: "85px",
+                            width: "13%",
                             render: function (data) {
 
                                 return self.escapeHtml(
@@ -565,7 +565,7 @@
 
                         {
                             data: "Description",
-                            width: "140px",
+                            width: "22%",
                             render: function (data) {
 
                                 return '<div class="br-description">' +
@@ -580,7 +580,7 @@
                         {
                             data: "TrackingNumber",
                             className: "text-center",
-                            width: "80px",
+                            width: "12%",
                             render: function (data) {
 
                                 return self.escapeHtml(
@@ -593,7 +593,7 @@
                         {
                             data: "Amount",
                             className: "text-left",
-                            width: "85px",
+                            width: "13%",
                             render: function (data) {
 
                                 return self.formatAmount(data);
@@ -615,7 +615,7 @@
                         {
                             data: "AmountDifference",
                             className: "text-left",
-                            width: "90px",
+                            width: "11%",
                             render: function (data) {
 
                                 return self.formatAmount(data);
