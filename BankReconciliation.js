@@ -14,7 +14,7 @@
             selectedAccountingDetailId: null,
             selectedBankTransactionIds: [],
             selectedAccountingDetailIds: [],
-            candidateMode: 0,
+            candidateMode: 1,
             totalCount: 0,
             totalPages: 0,
             reconciliationState: 0,
@@ -764,7 +764,7 @@
 
             $("#btnOtherMatch").on("click", function () {
 
-                self.state.candidateMode = 0;
+                self.state.candidateMode = 2;
 
                 self.reloadCandidateTable();
 
@@ -801,7 +801,7 @@
                     return;
                 }
 
-                self.state.candidateMode = 1;
+                self.state.candidateMode = 2;
 
                 self.reloadCandidateTable();
 
