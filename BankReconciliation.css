@@ -482,6 +482,7 @@
         grid-template-columns: minmax(0, 1.55fr) minmax(360px, 1fr);
         gap: 6px;
         align-items: start;
+        margin-top: 8px;
     }
 
     #bankReconciliationArea .br-bank-pane,
@@ -578,6 +579,10 @@
     #bankReconciliationArea .br-workspace {
         grid-template-columns: 1fr;
         gap: 6px;
+    }
+
+    #bankReconciliationArea .br-summary-card {
+        margin-bottom: 8px;
     }
 
     #bankReconciliationArea .br-selected-values {
