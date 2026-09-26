@@ -319,7 +319,12 @@
 
                 </div>
 
-                <div class="card br-transactions-card mt-2">
+
+
+                <div class="br-workspace">
+
+                    <div class="br-bank-pane">
+                <div class="card br-transactions-card">
 
                     <div class="card-header bg-white border-charkheh2 d-flex justify-content-between align-items-center py-0">
 
@@ -504,7 +509,10 @@
 
                 </div>
 
-                <div class="card br-match-card mt-2">
+                    </div>
+
+                    <div class="br-match-pane">
+                <div class="card br-match-card">
 
                     <div class="card-header bg-white border-charkheh2 d-flex justify-content-between align-items-center py-1">
 
@@ -530,6 +538,39 @@
                     </div>
 
                     <div class="card-body py-1">
+
+<div class="br-selected-transaction">
+
+                            <div class="br-selected-title">
+                                <i class="fas fa-hand-pointer ml-1"></i>
+                                تراکنش انتخاب‌شده
+                            </div>
+
+                            <div class="br-selected-values">
+
+                                <div class="br-selected-item">
+                                    <span>تاریخ</span>
+                                    <strong id="selectedTransactionDate">-</strong>
+                                </div>
+
+                                <div class="br-selected-item br-selected-description">
+                                    <span>شرح</span>
+                                    <strong id="selectedTransactionDescription">تراکنشی انتخاب نشده است</strong>
+                                </div>
+
+                                <div class="br-selected-item">
+                                    <span>مبلغ</span>
+                                    <strong id="selectedTransactionAmount">-</strong>
+                                </div>
+
+                                <div class="br-selected-item">
+                                    <span>مانده تطبیق</span>
+                                    <strong id="selectedTransactionRemaining">-</strong>
+                                </div>
+
+                            </div>
+
+                        </div>
 
                         <div class="br-match-actions">
 
@@ -579,7 +620,7 @@
 
                 </div>
 
-                <div class="card br-candidates-card mt-2">
+                <div class="card br-candidates-card">
 
                     <div class="card-header bg-white border-charkheh2 d-flex justify-content-between align-items-center py-1">
 
@@ -660,6 +701,10 @@
         </div>
     </div>
 </div>
+
+                    </div>
+
+                </div>
 
 <script src="~/Scripts/vendors/select2/dist/js/select2.full.min.js?v=@(ViewContext.Controller.GetType().Assembly.GetName().Version)"></script>
 <script src="~/Scripts/vendors/select2/dist/js/select2.@(Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName).js?v=@(ViewContext.Controller.GetType().Assembly.GetName().Version)"></script>
