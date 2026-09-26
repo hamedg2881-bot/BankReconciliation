@@ -805,6 +805,9 @@
 
         selectBankTransaction: function (id) {
 
+            var self = this;
+            var selectedTransaction = null;
+
             this.state.selectedBankTransactionId =
                 Number(id);
 
@@ -831,10 +834,27 @@
                         data &&
                         Number(data.Id) === Number(id)
                     ) {
+                        selectedTransaction = data;
                         this.select();
                     }
 
                 });
+
+            if (selectedTransaction) {
+
+                $("#selectedTransactionDate")
+                    .text(self.formatDate(selectedTransaction.TransactionDate));
+
+                $("#selectedTransactionDescription")
+                    .text(selectedTransaction.Description || "-");
+
+                $("#selectedTransactionAmount")
+                    .text(self.formatAmount(selectedTransaction.Amount));
+
+                $("#selectedTransactionRemaining")
+                    .text(self.formatAmount(selectedTransaction.RemainingAmount));
+
+            }
 
             $("#btnMatch")
                 .prop("disabled", true);
@@ -1528,6 +1548,18 @@
 
             $("#matchScoreLabel")
                 .text("میزان تطابق");
+
+            $("#selectedTransactionDate")
+                .text("-");
+
+            $("#selectedTransactionDescription")
+                .text("تراکنشی انتخاب نشده است");
+
+            $("#selectedTransactionAmount")
+                .text("-");
+
+            $("#selectedTransactionRemaining")
+                .text("-");
 
         },
 
