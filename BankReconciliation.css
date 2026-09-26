@@ -477,6 +477,77 @@
         color: #B0CB1F !important;
     }
 
+    #bankReconciliationArea .br-workspace {
+        display: grid;
+        grid-template-columns: minmax(0, 1.55fr) minmax(360px, 1fr);
+        gap: 8px;
+        align-items: start;
+    }
+
+    #bankReconciliationArea .br-bank-pane,
+    #bankReconciliationArea .br-match-pane {
+        min-width: 0;
+    }
+
+    #bankReconciliationArea .br-bank-pane .br-transactions-card,
+    #bankReconciliationArea .br-match-pane .br-match-card,
+    #bankReconciliationArea .br-match-pane .br-candidates-card {
+        margin-top: 0 !important;
+    }
+
+    #bankReconciliationArea .br-match-pane .br-candidates-card {
+        margin-top: 8px !important;
+    }
+
+    #bankReconciliationArea .br-selected-transaction {
+        border: 1px solid rgba(38, 57, 99, .12);
+        background-color: rgba(38, 57, 99, .035);
+        border-right: 3px solid #B0CB1F;
+        margin-bottom: 8px;
+        padding: 7px 9px;
+    }
+
+    #bankReconciliationArea .br-selected-title {
+        color: #263963;
+        font-weight: bold;
+        margin-bottom: 6px;
+    }
+
+    #bankReconciliationArea .br-selected-values {
+        display: grid;
+        grid-template-columns: 90px minmax(0, 1fr) 110px 110px;
+        gap: 6px;
+    }
+
+    #bankReconciliationArea .br-selected-item {
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    #bankReconciliationArea .br-selected-item span {
+        color: #888;
+        font-size: 9px;
+    }
+
+    #bankReconciliationArea .br-selected-item strong {
+        color: #263963;
+        font-size: 11px;
+        font-weight: bold;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    #bankReconciliationArea .br-selected-item:not(.br-selected-description) strong {
+        direction: ltr;
+    }
+
+    #bankReconciliationArea .br-match-pane .br-candidates-card .card-body {
+        padding-bottom: 2px !important;
+    }
+
 @media (max-width: 991px) {
 
     #bankReconciliationArea .br-transaction-tools {
@@ -503,6 +574,15 @@
 }
 
 @media (max-width: 767px) {
+
+    #bankReconciliationArea .br-workspace {
+        grid-template-columns: 1fr;
+    }
+
+    #bankReconciliationArea .br-selected-values {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
 
     #bankReconciliationArea .br-tabs .nav-link {
         padding: .4rem .45rem;
