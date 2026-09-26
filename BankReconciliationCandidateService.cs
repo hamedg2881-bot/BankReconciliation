@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using CDS.BIMS.Application.Dto.CDSBase;
 using CDS.BIMS.Application.Dto.Financial;
@@ -94,6 +95,7 @@ namespace CDS.BIMS.Application.Service.Financial
 
                 var bankAccount =
                     _bankAccountRepository.Query
+                        .Include(x => x.Center)
                         .FirstOrDefault(x =>
                             x.Id == reconciliation.BankAccountId);
 
@@ -230,6 +232,10 @@ namespace CDS.BIMS.Application.Service.Financial
                 var detailsQuery =
                     from detail in
                         _accountingDocDetailRepository.Query
+                            .Include(x => x.AccountingDoc)
+                            .Include(x => x.Account)
+                            .Include(x => x.DepositSlip)
+                            .Include(x => x.Cheque)
 
                     where
                         allowedAccountIds.Contains(
