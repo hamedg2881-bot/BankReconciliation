@@ -280,6 +280,19 @@
                     },
 
                     {
+                        data: null,
+                        className: "text-center",
+                        width: "75px",
+                        render: function (data, type, row) {
+
+                            return self.number(row.Credit) > 0
+                                ? "واریز"
+                                : "برداشت";
+
+                        }
+                    },
+
+                    {
                         data: "TrackingNumber",
                         className: "text-center",
                         width: "130px",
