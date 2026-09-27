@@ -1929,6 +1929,8 @@
 
                 });
 
+            });
+
         },
 
         finalizeReconciliation: function () {
@@ -1993,6 +1995,8 @@
                     );
 
                 });
+
+            });
 
         },
 
