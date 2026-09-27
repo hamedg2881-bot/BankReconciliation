@@ -268,9 +268,9 @@ namespace CDS.BIMS.Application.Service.Financial
                     }
                 }
 
-                if (filter.ColumnFilters != null)
+                if (columnFilters != null)
                 {
-                    foreach (var columnFilter in filter.ColumnFilters)
+                    foreach (var columnFilter in columnFilters)
                     {
                         if (string.IsNullOrWhiteSpace(columnFilter.Value))
                             continue;
