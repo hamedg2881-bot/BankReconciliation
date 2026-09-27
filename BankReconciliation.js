@@ -107,18 +107,20 @@
                 isGregorian: false
             });
 
-            $("#reconciliationHistoryTable [data-filter=\"FromDate\"]").MdPersianDateTimePicker({
-                targetTextSelector: "#reconciliationHistoryTable [data-filter=\"FromDate\"]",
-                enableTimePicker: false,
-                textFormat: "yyyy/MM/dd",
-                isGregorian: false
-            });
+            $("#reconciliationHistoryModal").on("shown.bs.modal", function () {
+                $("#historyFilterFromDate").MdPersianDateTimePicker({
+                    targetTextSelector: "#historyFilterFromDate",
+                    enableTimePicker: false,
+                    textFormat: "yyyy/MM/dd",
+                    isGregorian: false
+                });
 
-            $("#reconciliationHistoryTable [data-filter=\"ToDate\"]").MdPersianDateTimePicker({
-                targetTextSelector: "#reconciliationHistoryTable [data-filter=\"ToDate\"]",
-                enableTimePicker: false,
-                textFormat: "yyyy/MM/dd",
-                isGregorian: false
+                $("#historyFilterToDate").MdPersianDateTimePicker({
+                    targetTextSelector: "#historyFilterToDate",
+                    enableTimePicker: false,
+                    textFormat: "yyyy/MM/dd",
+                    isGregorian: false
+                });
             });
 
             $("#bankReconciliationArea .br-numeric-filter")
@@ -2079,21 +2081,20 @@
                     language: dataTablesCurrentLanguage,
                     ajax: function (data, callback) {
 
-                        var request = {
-                            bankAccountId: Number($("#BankAccountId").val()) || null,
-                            start: data.start,
-                            length: data.length,
-                            draw: data.draw
-                        };
+                        data.bankAccountId = Number($("#BankAccountId").val()) || null;
+                        data.start = data.start;
+                        data.length = data.length;
+                        data.draw = data.draw;
 
-                        $("#reconciliationHistoryTable thead .br-history-column-filter").each(function (index) {
-                            var field = $(this).data("filter");
-                            var value = $(this).val() || "";
+                        $("#reconciliationHistoryTable thead .br-history-column-filter").each(function () {
+                            var index = $(this).closest("th").index();
 
-                            request["columns[" + index + "][data]"] = field;
-                            request["columns[" + index + "][name]"] = field;
-                            request["columns[" + index + "][search][value]"] = value;
+                            if (data.columns[index]) {
+                                data.columns[index].search.value = $(this).val() || "";
+                            }
                         });
+
+                        var request = data;
 
                         $.ajax({
                             url: "/BankReconciliation/GetHistory",
