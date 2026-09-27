@@ -80,8 +80,7 @@
                 targetTextSelector: "#FromDate",
                 enableTimePicker: false,
                 textFormat: "yyyy/MM/dd",
-                isGregorian: false,
-                englishNumber: true
+                isGregorian: false
             });
 
             $("#ToDate").MdPersianDateTimePicker({
