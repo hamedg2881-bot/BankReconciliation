@@ -149,12 +149,6 @@
                                 </button>
                             </div>
                             <div class="modal-body py-2">
-                                <div class="mb-2">
-                                    <input type="text"
-                                           id="reconciliationHistorySearch"
-                                           class="form-control form-control-sm"
-                                           placeholder="جستجو در حساب، تاریخ یا وضعیت..." />
-                                </div>
                                 <div class="table-responsive">
                                     <table class="table table-sm table-bordered mb-0" id="reconciliationHistoryTable">
                                         <thead>
@@ -164,6 +158,19 @@
                                                 <th>تا تاریخ</th>
                                                 <th>وضعیت</th>
                                                 <th>عملیات</th>
+                                            </tr>
+                                            <tr class="br-column-filter-row">
+                                                <th><input type="text" class="form-control form-control-sm br-history-column-filter" data-filter="BankAccountTitle" placeholder="حساب" /></th>
+                                                <th><input type="text" class="form-control form-control-sm br-history-column-filter" data-filter="FromDate" placeholder="از تاریخ" autocomplete="off" /></th>
+                                                <th><input type="text" class="form-control form-control-sm br-history-column-filter" data-filter="ToDate" placeholder="تا تاریخ" autocomplete="off" /></th>
+                                                <th>
+                                                    <select class="form-control form-control-sm br-history-column-filter" data-filter="State">
+                                                        <option value="">همه</option>
+                                                        <option value="1">نهایی شده</option>
+                                                        <option value="0">در حال ویرایش</option>
+                                                    </select>
+                                                </th>
+                                                <th></th>
                                             </tr>
                                         </thead>
                                         <tbody></tbody>
