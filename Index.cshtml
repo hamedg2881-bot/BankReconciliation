@@ -149,8 +149,8 @@
                                 </button>
                             </div>
                             <div class="modal-body py-2">
-                                <div class="table-responsive">
-                                    <table class="table table-sm table-bordered mb-0" id="reconciliationHistoryTable">
+                                <div class="table-responsive br-history-table-responsive">
+                                    <table class="table table-sm table-bordered mb-0" id="reconciliationHistoryTable" style="width:100%;">
                                         <thead>
                                             <tr>
                                                 <th>حساب بانکی</th>
@@ -161,8 +161,8 @@
                                             </tr>
                                             <tr class="br-column-filter-row">
                                                 <th><input type="text" class="form-control form-control-sm br-history-column-filter" data-filter="BankAccountTitle" placeholder="حساب" /></th>
-                                                <th><input type="text" class="form-control form-control-sm br-history-column-filter" data-filter="FromDate" placeholder="از تاریخ" autocomplete="off" /></th>
-                                                <th><input type="text" class="form-control form-control-sm br-history-column-filter" data-filter="ToDate" placeholder="تا تاریخ" autocomplete="off" /></th>
+                                                <th><input type="text" class="form-control form-control-sm br-history-column-filter" id="historyFilterFromDate" data-filter="FromDate" placeholder="از تاریخ" autocomplete="off" /></th>
+                                                <th><input type="text" class="form-control form-control-sm br-history-column-filter" id="historyFilterToDate" data-filter="ToDate" placeholder="تا تاریخ" autocomplete="off" /></th>
                                                 <th>
                                                     <select class="form-control form-control-sm br-history-column-filter" data-filter="State">
                                                         <option value="">همه</option>
