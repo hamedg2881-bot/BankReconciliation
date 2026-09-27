@@ -1877,15 +1877,9 @@
                     return;
                 }
 
-                swal({
-                    title: 'در حال اجرای تطبیق خودکار',
-                    html: '<div><i class="fas fa-spinner fa-spin fa-2x"></i></div><div class="mt-3">لطفاً تا پایان عملیات صبر کنید...</div>',
-                    allowOutsideClick: false,
-                    allowEscapeKey: false,
-                    showConfirmButton: false,
-                    showCloseButton: false,
-                    background: 'rgba(255, 255, 255, 1)'
-                });
+                var loading = $('<div class="br-auto-match-loading"><div class="br-auto-match-loading-content"><i class="fas fa-spinner fa-spin fa-2x"></i><div class="mt-3">در حال اجرای تطبیق خودکار، لطفاً صبر کنید...</div></div></div>');
+
+                $("body").append(loading);
 
                 setTimeout(function () {
 
@@ -1900,7 +1894,6 @@
                         .done(function (response) {
 
                             if (!self.handleResponse(response)) {
-                                swal.close();
                                 return;
                             }
 
@@ -1948,9 +1941,12 @@
                                 background: 'rgba(255, 255, 255, 1)'
                             });
 
+                        })
+                        .always(function () {
+                            loading.remove();
                         });
 
-                }, 100);
+                }, 50);
 
             });
 
