@@ -85,8 +85,6 @@ namespace CDS.BIMS.Application.Dto.Financial
 
         public BankReconciliationStatus? Status { get; set; }
 
-        public Dictionary<string, string> ColumnFilters { get; set; }
-
         public int Page { get; set; }
 
         public int PageSize { get; set; }
@@ -157,8 +155,6 @@ namespace CDS.BIMS.Application.Dto.Financial
         public bool? TrackingMatched { get; set; }
 
         public int DateTolerance { get; set; }
-
-        public Dictionary<string, string> ColumnFilters { get; set; }
 
         public BankReconciliationCandidateMode Mode { get; set; }
 
