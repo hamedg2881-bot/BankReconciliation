@@ -1184,27 +1184,67 @@ namespace CDS.BIMS.Application.Service.Financial
                 var transactions =
                     _bankTransactionRepository.Query
                         .Where(x =>
-                            x.BankAccountId ==
-                            reconciliation.BankAccountId &&
+                            x.BankAccountId == reconciliation.BankAccountId &&
                             x.TransactionDate >= fromDate &&
                             x.TransactionDate < toDate)
                         .ToList();
+
+                var transactionIds = transactions.Select(x => x.Id).ToList();
+
+                var bankMatchedAmounts =
+                    _matchRepository.Query
+                        .Where(x => transactionIds.Contains(x.BankTransactionId))
+                        .GroupBy(x => x.BankTransactionId)
+                        .Select(g => new
+                        {
+                            BankTransactionId = g.Key,
+                            MatchedAmount = g.Sum(x => x.MatchedAmount)
+                        })
+                        .ToList()
+                        .ToDictionary(x => x.BankTransactionId, x => x.MatchedAmount);
+
+                var details =
+                    _accountingDocDetailRepository.Query
+                        .Include(x => x.AccountingDocDetailCenters)
+                        .Include(x => x.AccountingDoc)
+                        .Include(x => x.DepositSlip)
+                        .Include(x => x.Cheque)
+                        .Where(x =>
+                            allowedAccountIds.Contains(x.AccountId) &&
+                            x.AccountingDoc.AccountingDocDate >= candidateFromDate &&
+                            x.AccountingDoc.AccountingDocDate < candidateToDate &&
+                            x.AccountingDocDetailCenters.Any(y => y.CenterId == centerId))
+                        .ToList();
+
+                var detailIds = details.Select(x => x.Id).ToList();
+
+                var accountingMatchedAmounts =
+                    _matchRepository.Query
+                        .Where(x => detailIds.Contains(x.AccountingDocDetailId))
+                        .GroupBy(x => x.AccountingDocDetailId)
+                        .Select(g => new
+                        {
+                            AccountingDocDetailId = g.Key,
+                            MatchedAmount = g.Sum(x => x.MatchedAmount)
+                        })
+                        .ToList()
+                        .ToDictionary(x => x.AccountingDocDetailId, x => x.MatchedAmount);
 
                 var results =
                     new List<BankReconciliationAutoMatchResultDto>();
 
                 var userId = GetCurrentUserId();
+                var now = DateTime.Now;
 
                 foreach (var transaction in transactions)
                 {
-                    var bankAmount =
-                        GetAmount(transaction);
+                    var bankAmount = GetAmount(transaction);
 
-                    var bankMatchedAmount =
-                        GetBankMatchedAmount(transaction.Id);
+                    decimal bankMatchedAmount;
+                    if (!bankMatchedAmounts.TryGetValue(transaction.Id, out bankMatchedAmount))
+                        bankMatchedAmount = 0;
 
-                    var bankRemaining =
-                        bankAmount - bankMatchedAmount;
+                    var bankRemaining = bankAmount - bankMatchedAmount;
 
                     if (bankRemaining <= 0)
                     {
@@ -1213,31 +1253,12 @@ namespace CDS.BIMS.Application.Service.Financial
                             BankTransactionId = transaction.Id,
                             Matched = false,
                             MatchedAmount = 0,
-                            Status = GetStatus(
-                                bankAmount,
-                                bankMatchedAmount),
+                            Status = GetStatus(bankAmount, bankMatchedAmount),
                             CandidateCount = 0,
                             Reason = "مانده تراکنش بانکی صفر است."
                         });
-
                         continue;
                     }
-
-                    var candidateFromDate = transaction.TransactionDate.Date.AddDays(-2);
-                    var candidateToDate = transaction.TransactionDate.Date.AddDays(3);
-
-                    var details =
-                        _accountingDocDetailRepository.Query
-                            .Include(x => x.AccountingDocDetailCenters)
-                            .Include(x => x.AccountingDoc)
-                            .Where(x =>
-                                allowedAccountIds.Contains(x.AccountId) &&
-                                x.AccountingDoc.AccountingDocDate >= candidateFromDate &&
-                                x.AccountingDoc.AccountingDocDate < candidateToDate &&
-                                x.AccountingDocDetailCenters.Any(
-                                    c => c.CenterId ==
-                                         reconciliation.BankAccount.CenterId.Value))
-                            .ToList();
 
                     var validCandidates =
                         new List<AccountingDocDetail>();
