@@ -313,10 +313,12 @@
                         name: "Description",
                         render: function (data, type, row) {
 
-                            return '<div class="br-description">' +
-                                self.escapeHtml(
-                                    data || ""
-                                ) +
+                            var description = data || "";
+
+                            return '<div class="br-description" title="' +
+                                self.escapeHtml(description) +
+                                '">' +
+                                self.escapeHtml(description) +
                                 "</div>";
 
                         }
@@ -680,10 +682,12 @@
                             width: "24%",
                             render: function (data) {
 
-                                return '<div class="br-description">' +
-                                    self.escapeHtml(
-                                        data || ""
-                                    ) +
+                                var description = data || "";
+
+                                return '<div class="br-description" title="' +
+                                    self.escapeHtml(description) +
+                                    '">' +
+                                    self.escapeHtml(description) +
                                     "</div>";
 
                             }
@@ -1005,7 +1009,7 @@
             $("#btnOtherMatch").prop("disabled", true);
             $("#btnRemoveMatch").prop("disabled", true);
             $("#matchScore").text("-");
-            $("#matchScoreLabel").text("میزان تطابق");
+            $("#matchScoreLabel").text("وضعیت تطبیق");
             $("#selectedTransactionDate").text("-");
             $("#selectedTransactionDescription").text("تراکنشی انتخاب نشده است");
             $("#selectedTransactionAmount").text("-");
@@ -1056,7 +1060,8 @@
                     .text(self.formatDate(selectedTransaction.TransactionDate));
 
                 $("#selectedTransactionDescription")
-                    .text(selectedTransaction.Description || "-");
+                    .text(selectedTransaction.Description || "-")
+                    .attr("title", selectedTransaction.Description || "");
 
                 $("#selectedTransactionAmount")
                     .text(self.formatAmount(selectedTransaction.Amount));
@@ -1079,7 +1084,7 @@
                 .text("-");
 
             $("#matchScoreLabel")
-                .text("میزان تطابق");
+                .text("وضعیت تطبیق");
 
             this.reloadCandidateTable();
 
@@ -1116,7 +1121,7 @@
                 .text(
                     candidate.AmountMatched
                         ? "تطبیق مبلغ"
-                        : "میزان تطابق"
+                        : "وضعیت تطبیق"
                 );
 
         },
