@@ -527,6 +527,7 @@ namespace CDS.BIMS.Application.Service.Financial
 
                 var detail =
                     _accountingDocDetailRepository.Query
+                        .Include(x => x.AccountingDocDetailCenters)
                         .FirstOrDefault(x =>
                             x.Id == request.AccountingDocDetailId);
 
