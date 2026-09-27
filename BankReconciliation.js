@@ -598,7 +598,21 @@
                                     data: []
                                 });
 
-                            });
+                            drawCallback: function () {
+
+                    var hasRows = self.state.candidateTable.rows({ page: "current" }).any();
+                    var emptyRow = $("#accountingCandidates tbody td.dataTables_empty");
+
+                    if (!hasRows && emptyRow.length) {
+                        var message = !self.state.selectedBankTransactionId
+                            ? "برای مشاهده اسناد، ابتدا یک تراکنش بانکی را انتخاب کنید."
+                            : "سندی مطابق شرایط تطبیق و فیلترهای انتخاب‌شده یافت نشد.";
+                        emptyRow.text(message);
+                    }
+
+                },
+
+                });
 
                     },
 
