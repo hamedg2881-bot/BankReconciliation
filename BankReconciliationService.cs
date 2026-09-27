@@ -270,12 +270,6 @@ namespace CDS.BIMS.Application.Service.Financial
 
                 var fromDate = reconciliation.FromDate.Date;
                 var toDate = reconciliation.ToDate.Date.AddDays(1);
-                var candidateFromDate = reconciliation.FromDate.Date.AddDays(-2);
-                var candidateToDate = reconciliation.ToDate.Date.AddDays(3);
-                var centerId = reconciliation.BankAccount.CenterId.Value;
-                var candidateFromDate = reconciliation.FromDate.Date.AddDays(-2);
-                var candidateToDate = reconciliation.ToDate.Date.AddDays(3);
-                var centerId = reconciliation.BankAccount.CenterId.Value;
 
                 var transactionQuery =
                     _bankTransactionRepository.Query.Where(x =>
@@ -1347,14 +1341,28 @@ namespace CDS.BIMS.Application.Service.Financial
                             MatchType =
                                 BankReconciliationMatchType.Automatic,
                             MatchDate =
-                                DateTime.Now,
+                                now,
                             CreatorUserId =
                                 userId,
                             CreateDate =
-                                DateTime.Now,
+                                now,
                             EntityState =
                                 EntityStates.Added
                         });
+
+                    bankMatchedAmounts[transaction.Id] =
+                        bankMatchedAmount + bankRemaining;
+
+                    decimal selectedMatchedAmount;
+                    if (!accountingMatchedAmounts.TryGetValue(
+                            selected.Id,
+                            out selectedMatchedAmount))
+                    {
+                        selectedMatchedAmount = 0;
+                    }
+
+                    accountingMatchedAmounts[selected.Id] =
+                        selectedMatchedAmount + bankRemaining;
 
                     results.Add(new BankReconciliationAutoMatchResultDto
                     {
