@@ -840,3 +840,16 @@
 #bankReconciliationArea .br-summary-card {
     cursor: pointer;
 }
+
+
+#bankReconciliationArea .br-match-actions .btn {
+    transition: opacity .15s ease, background-color .15s ease;
+}
+
+#bankReconciliationArea .br-match-actions .btn:disabled {
+    cursor: not-allowed;
+}
+
+#bankReconciliationArea .br-match-score strong {
+    min-width: 70px;
+}
