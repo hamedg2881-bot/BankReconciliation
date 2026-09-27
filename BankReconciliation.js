@@ -27,6 +27,7 @@
 
             this.initBankAccount();
             this.initDates();
+            this.initColumnFilters();
             this.initTables();
             this.bindEvents();
             this.updateButtons();
@@ -79,7 +80,8 @@
                 targetTextSelector: "#FromDate",
                 enableTimePicker: false,
                 textFormat: "yyyy/MM/dd",
-                isGregorian: false
+                isGregorian: false,
+                englishNumber: true
             });
 
             $("#ToDate").MdPersianDateTimePicker({
@@ -94,6 +96,39 @@
                 self.state.dateTolerance = Number.isNaN(value) ? 0 : value;
                 self.reloadCandidateTable();
             });
+
+        },
+
+        initColumnFilters: function () {
+
+            $("#bankFilterTransactionDate, #candidateFilterAccountingDocDate").MdPersianDateTimePicker({
+                enableTimePicker: false,
+                textFormat: "yyyy/MM/dd",
+                isGregorian: false,
+                englishNumber: true
+            });
+
+            $("#bankReconciliationArea .br-numeric-filter")
+                .on("input", function () {
+                    var value = $(this).val() || "";
+
+                    value = value
+                        .replace(/[۰-۹]/g, function (digit) {
+                            return "۰۱۲۳۴۵۶۷۸۹".indexOf(digit);
+                        })
+                        .replace(/[٠-٩]/g, function (digit) {
+                            return "٠١٢٣٤٥٦٧٨٩".indexOf(digit);
+                        })
+                        .replace(/[^0-9.]/g, "");
+
+                    var parts = value.split(".");
+
+                    if (parts.length > 2) {
+                        value = parts[0] + "." + parts.slice(1).join("");
+                    }
+
+                    $(this).val(value);
+                });
 
         },
 
