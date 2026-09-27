@@ -21,6 +21,9 @@ namespace CDS.BIMS.Application.ServiceContract.Financial
             BankReconciliationFilterDto filter,
             Dictionary<string, string> columnFilters);
 
+        CDSResponse<List<BankReconciliationHistoryDto>> GetHistory(
+            int? bankAccountId);
+
         CDSResponse<List<BankReconciliationMatchDto>> GetMatches(
             long reconciliationId,
             long bankTransactionId);
