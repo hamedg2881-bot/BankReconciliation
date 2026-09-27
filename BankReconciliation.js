@@ -107,6 +107,12 @@
                 isGregorian: false
             });
 
+            $("#reconciliationHistoryTable [data-filter=\"FromDate\"], #reconciliationHistoryTable [data-filter=\"ToDate\"]").MdPersianDateTimePicker({
+                enableTimePicker: false,
+                textFormat: "yyyy/MM/dd",
+                isGregorian: false
+            });
+
             $("#bankReconciliationArea .br-numeric-filter")
                 .on("input", function () {
                     var value = $(this).val() || "";
