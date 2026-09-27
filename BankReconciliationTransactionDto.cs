@@ -25,6 +25,17 @@ namespace CDS.BIMS.Application.Dto.Financial
         public DateTime? FinalizedDate { get; set; }
         public int? FinalizedByUserId { get; set; }
     }
+    public class BankReconciliationHistoryDto
+    {
+        public long Id { get; set; }
+        public int BankAccountId { get; set; }
+        public string BankAccountTitle { get; set; }
+        public DateTime FromDate { get; set; }
+        public DateTime ToDate { get; set; }
+        public BankReconciliationState State { get; set; }
+        public DateTime? FinalizedDate { get; set; }
+    }
+
     public class BankReconciliationTransactionDto
     {
         public long Id { get; set; }
