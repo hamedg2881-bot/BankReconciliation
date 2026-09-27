@@ -90,7 +90,8 @@
             });
 
             $("#candidateDateTolerance").on("change", function () {
-                self.state.dateTolerance = Number($(this).val()) || 2;
+                var value = Number($(this).val());
+                self.state.dateTolerance = Number.isNaN(value) ? 0 : value;
                 self.reloadCandidateTable();
             });
 
@@ -158,6 +159,9 @@
 
                                 Status:
                                     self.state.status,
+
+                                ColumnFilters:
+                                    self.getColumnFilters("#bankTransactions"),
 
                                 Page:
                                     self.state.page,
@@ -468,6 +472,9 @@
 
                                     TrackingMatched: null,
 
+                                    ColumnFilters:
+                                        self.getColumnFilters("#accountingCandidates"),
+
                                     DateTolerance:
                                         Number.isNaN(Number(self.state.dateTolerance))
                                             ? 0
@@ -720,6 +727,9 @@
 
                 });
 
+            this.bindColumnFilters("#bankTransactions", this.state.bankTable);
+            this.bindColumnFilters("#accountingCandidates", this.state.candidateTable);
+
             this.state.candidateTable.on("draw.dt", function () {
                 var pageInfo = self.state.candidateTable.page.info();
                 self.state.candidateTable
@@ -730,6 +740,46 @@
                     });
             });
 
+        },
+
+        getColumnFilters: function (selector) {
+
+            var filters = {};
+
+            $(selector + " thead .br-column-filter").each(function () {
+                var key = $(this).data("filter");
+                var value = $(this).val();
+
+                if (key && value != null && String(value).trim() !== "") {
+                    filters[key] = String(value).trim();
+                }
+            });
+
+            return filters;
+        },
+
+        bindColumnFilters: function (selector, table) {
+
+            var self = this;
+            var timer = null;
+
+            $(selector + " thead .br-column-filter")
+                .on("keyup", function (e) {
+
+                    if (e.key === "Enter") {
+                        clearTimeout(timer);
+                        table.ajax.reload(null, true);
+                        return;
+                    }
+
+                    clearTimeout(timer);
+                    timer = setTimeout(function () {
+                        table.ajax.reload(null, true);
+                    }, 400);
+                })
+                .on("change", function () {
+                    table.ajax.reload(null, true);
+                });
         },
 
         bindEvents: function () {
