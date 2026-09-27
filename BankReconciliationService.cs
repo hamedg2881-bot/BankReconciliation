@@ -1004,7 +1004,7 @@ namespace CDS.BIMS.Application.Service.Financial
                     return Error<bool>(
                         "تطبیق مورد نظر یافت نشد.");
 
-                _matchRepository.Delete(match);
+                _matchRepository.Remove(match);
 
                 _unitOfWorkScope.Commit();
 
