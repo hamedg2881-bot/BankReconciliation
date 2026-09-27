@@ -1341,11 +1341,11 @@ namespace CDS.BIMS.Application.Service.Financial
                             MatchType =
                                 BankReconciliationMatchType.Automatic,
                             MatchDate =
-                                now,
+                                DateTime.Now,
                             CreatorUserId =
                                 userId,
                             CreateDate =
-                                now,
+                                DateTime.Now,
                             EntityState =
                                 EntityStates.Added
                         });
