@@ -278,7 +278,9 @@
 
                                 if (data.columns[index]) {
                                     data.columns[index].search.value =
-                                        $(this).val() || "";
+                                        $(this).data("filter") === "TransactionDate"
+                                            ? self.getDateFilterValue("#bankFilterTransactionDate")
+                                            : $(this).val() || "";
                                 }
                             });
 
@@ -2577,6 +2579,50 @@
                 .closest(".md-form")
                 .find("label")
                 .toggleClass("active", !!value);
+        },
+
+        getDateFilterValue: function (selector) {
+
+            var input = $(selector);
+
+            if (!input.length || !input.val()) {
+                return "";
+            }
+
+            try {
+                var date = input.MdPersianDateTimePicker("getDate");
+
+                if (date && !isNaN(date.getTime())) {
+                    var value;
+
+                    if (window.MdsPersianDateTimePicker &&
+                        typeof MdsPersianDateTimePicker.convertDateToString === "function") {
+                        value = MdsPersianDateTimePicker.convertDateToString(
+                            date,
+                            false,
+                            "yyyy/MM/dd");
+                    } else {
+                        value = input.val();
+                    }
+
+                    return value
+                        .replace(/[۰-۹]/g, function (digit) {
+                            return "۰۱۲۳۴۵۶۷۸۹".indexOf(digit);
+                        })
+                        .replace(/[٠-٩]/g, function (digit) {
+                            return "٠١٢٣٤٥٦٧٨٩".indexOf(digit);
+                        });
+                }
+            } catch (e) {
+            }
+
+            return input.val()
+                .replace(/[۰-۹]/g, function (digit) {
+                    return "۰۱۲۳۴۵۶۷۸۹".indexOf(digit);
+                })
+                .replace(/[٠-٩]/g, function (digit) {
+                    return "٠١٢٣٤٥٦٧٨٩".indexOf(digit);
+                });
         },
 
         formatDate: function (value) {
