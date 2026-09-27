@@ -273,6 +273,9 @@ namespace CDS.BIMS.Application.Service.Financial
                 var candidateFromDate = reconciliation.FromDate.Date.AddDays(-2);
                 var candidateToDate = reconciliation.ToDate.Date.AddDays(3);
                 var centerId = reconciliation.BankAccount.CenterId.Value;
+                var candidateFromDate = reconciliation.FromDate.Date.AddDays(-2);
+                var candidateToDate = reconciliation.ToDate.Date.AddDays(3);
+                var centerId = reconciliation.BankAccount.CenterId.Value;
 
                 var transactionQuery =
                     _bankTransactionRepository.Query.Where(x =>
@@ -965,11 +968,11 @@ namespace CDS.BIMS.Application.Service.Financial
                             MatchType =
                                 BankReconciliationMatchType.Group,
                             MatchDate =
-                                DateTime.Now,
+                                now,
                             CreatorUserId =
                                 userId,
                             CreateDate =
-                                DateTime.Now,
+                                now,
                             EntityState =
                                 EntityStates.Added
                         });
