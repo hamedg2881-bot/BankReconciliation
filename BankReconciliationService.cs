@@ -155,8 +155,8 @@ namespace CDS.BIMS.Application.Service.Financial
                 }
 
                 var history = query
-                    .OrderByDescending(x => x.FromDate)
-                    .ThenByDescending(x => x.ToDate)
+                    .OrderByDescending(x => x.ToDate)
+                    .ThenByDescending(x => x.FromDate)
                     .ThenByDescending(x => x.Id)
                     .ToList()
                     .Select(x => new BankReconciliationHistoryDto
