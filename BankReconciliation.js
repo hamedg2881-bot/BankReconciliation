@@ -1880,70 +1880,63 @@
                 swal({
                     title: 'در حال اجرای تطبیق خودکار',
                     text: 'لطفاً تا پایان عملیات صبر کنید...',
+                    html: '<div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div><div class="mt-2">لطفاً تا پایان عملیات صبر کنید...</div>',
                     allowOutsideClick: false,
                     allowEscapeKey: false,
                     showConfirmButton: false,
-                    background: 'rgba(255, 255, 255, 1)',
-                    onOpen: function () {
-                        swal.showLoading();
-                    }
+                    showCloseButton: false,
+                    background: 'rgba(255, 255, 255, 1)'
                 });
 
                 $.ajax({
-
-                url:
-                    "/BankReconciliation/AutoMatch",
-
-                type:
-                    "POST",
-
-                data: {
-
-                    reconciliationId:
-                        self.state.reconciliationId
-
-                }
-
-            })
-                .done(function (response) {
-
-                    if (!self.handleResponse(response)) {
-                        return;
+                    url: "/BankReconciliation/AutoMatch",
+                    type: "POST",
+                    data: {
+                        reconciliationId:
+                            self.state.reconciliationId
                     }
-
-                    var results =
-                        response.Result || [];
-
-                    var matched = 0;
-
-                    $.each(
-                        results,
-                        function (_, item) {
-
-                            if (item.Matched) {
-                                matched++;
-                            }
-
-                        }
-                    );
-
-                    self.showSuccess(
-                        matched +
-                        " تراکنش به صورت خودکار تطبیق داده شد."
-                    );
-
-                    self.reloadBankTable();
-
                 })
-                .fail(function () {
+                    .done(function (response) {
 
-                    swal.close();
+                        swal.close();
 
-                    self.showError(
-                        "خطا در اجرای تطبیق خودکار."
-                    );
+                        if (!self.handleResponse(response)) {
+                            return;
+                        }
 
-                });
+                        var results =
+                            response.Result || [];
+
+                        var matched = 0;
+
+                        $.each(
+                            results,
+                            function (_, item) {
+
+                                if (item.Matched) {
+                                    matched++;
+                                }
+
+                            }
+                        );
+
+                        self.showSuccess(
+                            matched +
+                            " تراکنش به صورت خودکار تطبیق داده شد."
+                        );
+
+                        self.reloadBankTable();
+
+                    })
+                    .fail(function () {
+
+                        swal.close();
+
+                        self.showError(
+                            "خطا در اجرای تطبیق خودکار."
+                        );
+
+                    });
 
             });
 
