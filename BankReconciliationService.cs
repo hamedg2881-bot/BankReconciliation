@@ -259,6 +259,7 @@ namespace CDS.BIMS.Application.Service.Financial
             {
                 var reconciliation =
                     _bankReconciliationRepository.Query
+                        .Include(x => x.BankAccount.Center)
                         .FirstOrDefault(x => x.Id == reconciliationId);
 
                 if (reconciliation == null)
@@ -526,6 +527,7 @@ namespace CDS.BIMS.Application.Service.Financial
             {
                 var reconciliation =
                     _bankReconciliationRepository.Query
+                        .Include(x => x.BankAccount.Center)
                         .FirstOrDefault(x => x.Id == reconciliationId);
 
                 if (reconciliation == null)
@@ -765,6 +767,8 @@ namespace CDS.BIMS.Application.Service.Financial
 
                 var details =
                     _accountingDocDetailRepository.Query
+                        .Include(x => x.AccountingDocDetailCenters)
+                        .Include(x => x.AccountingDoc)
                         .Where(x => ids.Contains(x.Id))
                         .ToList();
 
@@ -874,6 +878,8 @@ namespace CDS.BIMS.Application.Service.Financial
 
                 var detail =
                     _accountingDocDetailRepository.Query
+                        .Include(x => x.AccountingDocDetailCenters)
+                        .Include(x => x.AccountingDoc)
                         .FirstOrDefault(x =>
                             x.Id == request.AccountingDocDetailId);
 
@@ -1353,7 +1359,7 @@ namespace CDS.BIMS.Application.Service.Financial
             long reconciliationId)
         {
             return _bankReconciliationRepository.Query
-                .Include(x => x.BankAccount)
+                .Include(x => x.BankAccount.Center)
                 .FirstOrDefault(x => x.Id == reconciliationId);
         }
 
