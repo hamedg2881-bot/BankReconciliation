@@ -854,3 +854,52 @@
 #bankReconciliationArea .br-match-score strong {
     min-width: 70px;
 }
+
+
+#bankReconciliationArea #reconciliationHistoryModal .modal-content {
+    border-radius: 0;
+}
+
+#bankReconciliationArea #reconciliationHistoryModal .modal-header {
+    border-bottom: 1px solid rgba(38, 57, 99, .15);
+}
+
+#bankReconciliationArea #reconciliationHistoryTable {
+    width: 100%;
+    margin: 0;
+}
+
+#bankReconciliationArea #reconciliationHistoryTable th,
+#bankReconciliationArea #reconciliationHistoryTable td {
+    text-align: center;
+    vertical-align: middle;
+    font-size: 11px;
+}
+
+#bankReconciliationArea #reconciliationHistoryTable thead th {
+    color: #263963;
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+#bankReconciliationArea .br-history-select {
+    font-size: 10px;
+    padding: .25rem .55rem;
+}
+
+#bankReconciliationArea .br-history-state {
+    display: inline-block;
+    min-width: 70px;
+    padding: 3px 5px;
+    font-size: 9px;
+}
+
+#bankReconciliationArea .br-history-finalized {
+    background-color: rgba(176, 203, 31, .2);
+    color: #263963;
+}
+
+#bankReconciliationArea .br-history-open {
+    background-color: rgba(38, 57, 99, .1);
+    color: #263963;
+}
