@@ -103,8 +103,7 @@
             $("#bankFilterTransactionDate, #candidateFilterAccountingDocDate").MdPersianDateTimePicker({
                 enableTimePicker: false,
                 textFormat: "yyyy/MM/dd",
-                isGregorian: false,
-                englishNumber: true
+                isGregorian: false
             });
 
             $("#bankReconciliationArea .br-numeric-filter")
