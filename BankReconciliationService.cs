@@ -139,7 +139,8 @@ namespace CDS.BIMS.Application.Service.Financial
 
         public CDSResponse<BankReconciliationPageDto> GetPage(
             long reconciliationId,
-            BankReconciliationFilterDto filter)
+            BankReconciliationFilterDto filter,
+            Dictionary<string, string> columnFilters)
         {
             try
             {
