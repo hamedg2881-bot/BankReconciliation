@@ -423,7 +423,8 @@
 
                 drawCallback: function () {
 
-                    var hasRows = self.state.bankTable.rows({ page: "current" }).any();
+                    var tableApi = this.api();
+                    var hasRows = tableApi.rows({ page: "current" }).any();
                     var emptyRow = $("#bankTransactions tbody td.dataTables_empty");
 
                     if (!hasRows && emptyRow.length) {
@@ -604,7 +605,8 @@
 
                     drawCallback: function () {
 
-                        var hasRows = self.state.candidateTable.rows({ page: "current" }).any();
+                        var tableApi = this.api();
+                        var hasRows = tableApi.rows({ page: "current" }).any();
                         var emptyRow = $("#accountingCandidates tbody td.dataTables_empty");
 
                         if (!hasRows && emptyRow.length) {
