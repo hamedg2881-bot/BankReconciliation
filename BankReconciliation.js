@@ -1291,6 +1291,8 @@
             })
                 .done(function (response) {
 
+                    swal.close();
+
                     if (!self.handleResponse(response)) {
                         return;
                     }
@@ -1875,6 +1877,18 @@
                     return;
                 }
 
+                swal({
+                    title: 'در حال اجرای تطبیق خودکار',
+                    text: 'لطفاً تا پایان عملیات صبر کنید...',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    showConfirmButton: false,
+                    background: 'rgba(255, 255, 255, 1)',
+                    onOpen: function () {
+                        swal.showLoading();
+                    }
+                });
+
                 $.ajax({
 
                 url:
@@ -1922,6 +1936,8 @@
 
                 })
                 .fail(function () {
+
+                    swal.close();
 
                     self.showError(
                         "خطا در اجرای تطبیق خودکار."
