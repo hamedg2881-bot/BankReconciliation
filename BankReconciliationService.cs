@@ -828,11 +828,11 @@ namespace CDS.BIMS.Application.Service.Financial
                             MatchType =
                                 BankReconciliationMatchType.Group,
                             MatchDate =
-                                now,
+                                DateTime.Now,
                             CreatorUserId =
                                 userId,
                             CreateDate =
-                                now,
+                                DateTime.Now,
                             EntityState =
                                 EntityStates.Added
                         });
