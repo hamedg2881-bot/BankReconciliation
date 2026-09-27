@@ -91,12 +91,73 @@
                 isGregorian: false
             });
 
+            this.initDateClearButtons();
+
             $("#candidateDateTolerance").on("change", function () {
                 var value = Number($(this).val());
                 self.state.dateTolerance = Number.isNaN(value) ? 0 : value;
                 self.reloadCandidateTable();
             });
 
+        },
+
+        initDateClearButtons: function () {
+
+            var self = this;
+
+            [
+                "#FromDate",
+                "#ToDate",
+                "#bankFilterTransactionDate",
+                "#candidateFilterAccountingDocDate",
+                "#historyFilterFromDate",
+                "#historyFilterToDate"
+            ].forEach(function (selector) {
+
+                var input = $(selector);
+
+                if (!input.length || input.siblings(".br-date-clear").length)
+                    return;
+
+                var wrapper = input.parent();
+
+                if (!wrapper.hasClass("br-date-filter-wrap")) {
+                    input.wrap('<div class="br-date-filter-wrap"></div>');
+                    wrapper = input.parent();
+                }
+
+                var clearButton = $('<button type="button" class="br-date-clear" title="پاک کردن تاریخ" tabindex="-1"><i class="fas fa-times"></i></button>');
+
+                wrapper.append(clearButton);
+
+                clearButton.on("click", function (event) {
+
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    try {
+                        input.MdPersianDateTimePicker("clearDate");
+                    } catch (e) {
+                    }
+
+                    input
+                        .val("")
+                        .trigger("input")
+                        .trigger("change")
+                        .trigger("blur");
+
+                    input
+                        .closest(".md-form")
+                        .find("label")
+                        .removeClass("active");
+                });
+
+                input.on("input change", function () {
+                    clearButton.toggle(!!$(this).val());
+                });
+
+                clearButton.toggle(!!input.val());
+            });
         },
 
         initColumnFilters: function () {
@@ -122,6 +183,8 @@
                     isGregorian: false
                 });
             });
+
+            this.initDateClearButtons();
 
             $("#bankReconciliationArea .br-numeric-filter")
                 .on("input", function () {
