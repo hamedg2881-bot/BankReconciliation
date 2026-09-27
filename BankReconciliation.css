@@ -864,11 +864,18 @@
     border-bottom: 1px solid rgba(38, 57, 99, .15);
 }
 
+#bankReconciliationArea #reconciliationHistoryModal .br-history-table-responsive {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
 #bankReconciliationArea #reconciliationHistoryTable {
     width: 100% !important;
-    max-width: 100%;
+    max-width: 100% !important;
+    min-width: 0 !important;
     margin: 0;
-    table-layout: fixed;
+    table-layout: fixed !important;
 }
 
 #bankReconciliationArea #reconciliationHistoryTable th,
