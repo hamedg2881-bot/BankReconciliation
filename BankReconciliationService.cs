@@ -8,6 +8,7 @@ using CDS.Core.Domain;
 using CDS.Core.Domain.Enums;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -1238,6 +1239,7 @@ namespace CDS.BIMS.Application.Service.Financial
             long reconciliationId)
         {
             return _bankReconciliationRepository.Query
+                .Include(x => x.BankAccount)
                 .FirstOrDefault(x => x.Id == reconciliationId);
         }
 
