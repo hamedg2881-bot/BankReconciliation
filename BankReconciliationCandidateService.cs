@@ -52,7 +52,8 @@ namespace CDS.BIMS.Application.Service.Financial
         public CDSResponse<BankReconciliationCandidateResultDto> GetCandidates(
             long reconciliationId,
             long bankTransactionId,
-            BankReconciliationCandidateFilterDto filter)
+            BankReconciliationCandidateFilterDto filter,
+            Dictionary<string, string> columnFilters)
         {
             try
             {
@@ -362,6 +363,124 @@ namespace CDS.BIMS.Application.Service.Financial
                         .ToList();
                 }
 
+                if (columnFilters != null)
+                {
+                    foreach (var columnFilter in columnFilters)
+                    {
+                        if (string.IsNullOrWhiteSpace(columnFilter.Value))
+                            continue;
+
+                        var value = columnFilter.Value.Trim();
+
+                        if (columnFilter.Key == "AccountingDocDate")
+                        {
+                            DateTime date;
+
+                            if (TryParseFilterDate(value, out date))
+                            {
+                                candidates = candidates
+                                    .Where(x => x.AccountingDocDate.Date == date.Date)
+                                    .ToList();
+                            }
+                            else
+                            {
+                                candidates.Clear();
+                            }
+                        }
+                        else if (columnFilter.Key == "AccountingDocId")
+                        {
+                            long id;
+
+                            if (long.TryParse(value, out id))
+                            {
+                                candidates = candidates
+                                    .Where(x => x.AccountingDocId == id)
+                                    .ToList();
+                            }
+                            else
+                            {
+                                candidates.Clear();
+                            }
+                        }
+                        else if (columnFilter.Key == "AccountTitle")
+                        {
+                            candidates = candidates
+                                .Where(x =>
+                                    x.AccountTitle != null &&
+                                    x.AccountTitle.Contains(value))
+                                .ToList();
+                        }
+                        else if (columnFilter.Key == "CenterTitle")
+                        {
+                            candidates = candidates
+                                .Where(x =>
+                                    (x.CenterTitle != null &&
+                                     x.CenterTitle.Contains(value)) ||
+                                    (x.CounterpartCenterTitle != null &&
+                                     x.CounterpartCenterTitle.Contains(value)))
+                                .ToList();
+                        }
+                        else if (columnFilter.Key == "Description")
+                        {
+                            candidates = candidates
+                                .Where(x =>
+                                    x.Description != null &&
+                                    x.Description.Contains(value))
+                                .ToList();
+                        }
+                        else if (columnFilter.Key == "TrackingSource")
+                        {
+                            candidates = candidates
+                                .Where(x =>
+                                    x.TrackingSource != null &&
+                                    x.TrackingSource.Contains(value))
+                                .ToList();
+                        }
+                        else if (columnFilter.Key == "TrackingNumber")
+                        {
+                            candidates = candidates
+                                .Where(x =>
+                                    x.TrackingNumber != null &&
+                                    x.TrackingNumber.Contains(value))
+                                .ToList();
+                        }
+                        else if (columnFilter.Key == "Amount" ||
+                                 columnFilter.Key == "AmountDifference")
+                        {
+                            decimal amount;
+
+                            if (decimal.TryParse(
+                                    value,
+                                    NumberStyles.Number,
+                                    CultureInfo.InvariantCulture,
+                                    out amount) ||
+                                decimal.TryParse(
+                                    value,
+                                    NumberStyles.Number,
+                                    CultureInfo.CurrentCulture,
+                                    out amount))
+                            {
+                                if (columnFilter.Key == "Amount")
+                                {
+                                    candidates = candidates
+                                        .Where(x => x.Amount == amount)
+                                        .ToList();
+                                }
+                                else
+                                {
+                                    candidates = candidates
+                                        .Where(x => x.AmountDifference == amount)
+                                        .ToList();
+                                }
+                            }
+                            else
+                            {
+                                candidates.Clear();
+                            }
+                        }
+                    }
+                }
+
                 if (filter.Mode == BankReconciliationCandidateMode.Normal)
                 {
                     candidates = candidates
@@ -409,6 +528,53 @@ namespace CDS.BIMS.Application.Service.Financial
             {
                 return Error<BankReconciliationCandidateResultDto>(e.Message);
             }
+        }
+
+        private bool TryParseFilterDate(
+            string value,
+            out DateTime date)
+        {
+            var formats = new[]
+            {
+                "yyyy/MM/dd",
+                "yyyy-MM-dd",
+                "yyyy/M/d",
+                "yyyy-M-d"
+            };
+
+            if (DateTime.TryParseExact(
+                    value,
+                    formats,
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.None,
+                    out date))
+            {
+                if (date.Year >= 1200 && date.Year <= 1700)
+                {
+                    var calendar = new PersianCalendar();
+
+                    try
+                    {
+                        date = calendar.ToDateTime(
+                            date.Year,
+                            date.Month,
+                            date.Day,
+                            0,
+                            0,
+                            0,
+                            0);
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            date = default(DateTime);
+            return false;
         }
 
         private decimal GetAmount(BankTransaction transaction)
