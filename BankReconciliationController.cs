@@ -1,5 +1,8 @@
 ﻿using CDS.BIMS.Application.Dto.Financial;
 using CDS.BIMS.Presentation.WebUI.ActionFilter;
+using DataTables.AspNet.Core;
+using System.Linq;
+using CDS.BIMS.Domain.Model.Enum.Financial;
 using System.Web.Mvc;
 using CDS.BIMS.Application.ServiceContract.Financial;
 
@@ -58,12 +61,35 @@ namespace CDS.BIMS.Presentation.WebUI.Controllers.Financial
         [HttpPost]
         public JsonResult GetPage(
             long reconciliationId,
-            BankReconciliationFilterDto filter)
+            BankReconciliationStatus? status,
+            IDataTablesRequest request)
         {
+            var columnFilters = request.Columns
+                .Where(x => x.Search != null &&
+                            !string.IsNullOrWhiteSpace(x.Search.Value))
+                .ToDictionary(
+                    x => x.Field.Substring(x.Field.LastIndexOf('.') + 1),
+                    x => x.Search.Value);
+
+            var filter = new BankReconciliationFilterDto
+            {
+                Search = request.Search == null
+                    ? null
+                    : request.Search.Value,
+                Status = status,
+                Page = request.Length <= 0
+                    ? 1
+                    : request.Start / request.Length + 1,
+                PageSize = request.Length <= 0
+                    ? 20
+                    : request.Length
+            };
+
             var result =
                 _bankReconciliationService.GetPage(
                     reconciliationId,
-                    filter);
+                    filter,
+                    columnFilters);
 
             return Json(result);
         }
@@ -87,13 +113,40 @@ namespace CDS.BIMS.Presentation.WebUI.Controllers.Financial
         public JsonResult GetCandidates(
             long reconciliationId,
             long bankTransactionId,
-            BankReconciliationCandidateFilterDto filter)
+            int dateTolerance,
+            BankReconciliationCandidateMode mode,
+            bool? trackingMatched,
+            IDataTablesRequest request)
         {
+            var columnFilters = request.Columns
+                .Where(x => x.Search != null &&
+                            !string.IsNullOrWhiteSpace(x.Search.Value))
+                .ToDictionary(
+                    x => x.Field.Substring(x.Field.LastIndexOf('.') + 1),
+                    x => x.Search.Value);
+
+            var filter = new BankReconciliationCandidateFilterDto
+            {
+                Search = request.Search == null
+                    ? null
+                    : request.Search.Value,
+                TrackingMatched = trackingMatched,
+                DateTolerance = dateTolerance,
+                Mode = mode,
+                Page = request.Length <= 0
+                    ? 1
+                    : request.Start / request.Length + 1,
+                PageSize = request.Length <= 0
+                    ? 20
+                    : request.Length
+            };
+
             var result =
                 _candidateService.GetCandidates(
                     reconciliationId,
                     bankTransactionId,
-                    filter);
+                    filter,
+                    columnFilters);
 
             return Json(result);
         }
