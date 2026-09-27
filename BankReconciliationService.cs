@@ -138,6 +138,49 @@ namespace CDS.BIMS.Application.Service.Financial
             }
         }
 
+        public CDSResponse<List<BankReconciliationHistoryDto>> GetHistory(
+            int? bankAccountId)
+        {
+            try
+            {
+                var query =
+                    _bankReconciliationRepository.Query
+                        .Include(x => x.BankAccount.Center)
+                        .AsQueryable();
+
+                if (bankAccountId.HasValue)
+                {
+                    query = query.Where(
+                        x => x.BankAccountId == bankAccountId.Value);
+                }
+
+                var history = query
+                    .OrderByDescending(x => x.FromDate)
+                    .ThenByDescending(x => x.ToDate)
+                    .ThenByDescending(x => x.Id)
+                    .ToList()
+                    .Select(x => new BankReconciliationHistoryDto
+                    {
+                        Id = x.Id,
+                        BankAccountId = x.BankAccountId,
+                        BankAccountTitle = x.BankAccount != null
+                            ? x.BankAccount.Title
+                            : null,
+                        FromDate = x.FromDate,
+                        ToDate = x.ToDate,
+                        State = x.State,
+                        FinalizedDate = x.FinalizedDate
+                    })
+                    .ToList();
+
+                return Success(history);
+            }
+            catch (Exception e)
+            {
+                return Error<List<BankReconciliationHistoryDto>>(e.Message);
+            }
+        }
+
         public CDSResponse<BankReconciliationPageDto> GetPage(
             long reconciliationId,
             BankReconciliationFilterDto filter,
