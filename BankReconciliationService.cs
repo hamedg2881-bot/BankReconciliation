@@ -1228,6 +1228,8 @@ namespace CDS.BIMS.Application.Service.Financial
 
                     var details =
                         _accountingDocDetailRepository.Query
+                            .Include(x => x.AccountingDocDetailCenters)
+                            .Include(x => x.AccountingDoc)
                             .Where(x =>
                                 allowedAccountIds.Contains(x.AccountId) &&
                                 x.AccountingDoc.AccountingDocDate >= candidateFromDate &&
