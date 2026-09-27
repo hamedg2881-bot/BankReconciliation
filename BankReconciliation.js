@@ -2563,6 +2563,22 @@
 
         },
 
+        setDateInputValue: function (selector, value) {
+
+            var input = $(selector);
+
+            if (!input.length) {
+                return;
+            }
+
+            input.val(value || "").trigger("input").trigger("change");
+
+            input
+                .closest(".md-form")
+                .find("label")
+                .toggleClass("active", !!value);
+        },
+
         formatDate: function (value) {
 
             if (!value) {
