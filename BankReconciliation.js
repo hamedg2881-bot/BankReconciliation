@@ -291,6 +291,7 @@
 
                     {
                         data: null,
+                        name: "Type",
                         className: "text-center",
                         width: "75px",
                         render: function (data, type, row) {
@@ -608,6 +609,7 @@
 
                         {
                             data: null,
+                            name: "CenterTitle",
                             width: "15%",
                             render: function (data, type, row) {
 
