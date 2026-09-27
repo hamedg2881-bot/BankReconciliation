@@ -2143,10 +2143,29 @@
                 }
 
                 row.toggle(
-                    row.find("td:first").text().toLowerCase().indexOf(search) >= 0
+                    row.find("td").map(function () {
+                        return $(this).text();
+                    }).get().join(" ").toLowerCase().indexOf(search) >= 0
                 );
 
             });
+
+        },
+
+        setDateInputValue: function (selector, value) {
+
+            var input = $(selector);
+
+            input
+                .val(value || "")
+                .trigger("input")
+                .trigger("change")
+                .trigger("blur");
+
+            input
+                .closest(".md-form")
+                .find("label")
+                .toggleClass("active", !!value);
 
         },
 
@@ -2194,11 +2213,15 @@
                         .append(option)
                         .trigger("change");
 
-                    $("#FromDate")
-                        .val(self.formatDate(reconciliation.FromDate));
+                    self.setDateInputValue(
+                        "#FromDate",
+                        self.formatDate(reconciliation.FromDate)
+                    );
 
-                    $("#ToDate")
-                        .val(self.formatDate(reconciliation.ToDate));
+                    self.setDateInputValue(
+                        "#ToDate",
+                        self.formatDate(reconciliation.ToDate)
+                    );
 
                     self.state.reconciliationId =
                         Number(reconciliation.Id);
