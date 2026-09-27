@@ -1879,8 +1879,7 @@
 
                 swal({
                     title: 'در حال اجرای تطبیق خودکار',
-                    text: 'لطفاً تا پایان عملیات صبر کنید...',
-                    html: '<div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div><div class="mt-2">لطفاً تا پایان عملیات صبر کنید...</div>',
+                    html: '<div><i class="fas fa-spinner fa-spin fa-2x"></i></div><div class="mt-3">لطفاً تا پایان عملیات صبر کنید...</div>',
                     allowOutsideClick: false,
                     allowEscapeKey: false,
                     showConfirmButton: false,
@@ -1888,55 +1887,70 @@
                     background: 'rgba(255, 255, 255, 1)'
                 });
 
-                $.ajax({
-                    url: "/BankReconciliation/AutoMatch",
-                    type: "POST",
-                    data: {
-                        reconciliationId:
-                            self.state.reconciliationId
-                    }
-                })
-                    .done(function (response) {
+                setTimeout(function () {
 
-                        swal.close();
-
-                        if (!self.handleResponse(response)) {
-                            return;
+                    $.ajax({
+                        url: "/BankReconciliation/AutoMatch",
+                        type: "POST",
+                        data: {
+                            reconciliationId:
+                                self.state.reconciliationId
                         }
-
-                        var results =
-                            response.Result || [];
-
-                        var matched = 0;
-
-                        $.each(
-                            results,
-                            function (_, item) {
-
-                                if (item.Matched) {
-                                    matched++;
-                                }
-
-                            }
-                        );
-
-                        self.showSuccess(
-                            matched +
-                            " تراکنش به صورت خودکار تطبیق داده شد."
-                        );
-
-                        self.reloadBankTable();
-
                     })
-                    .fail(function () {
+                        .done(function (response) {
 
-                        swal.close();
+                            if (!self.handleResponse(response)) {
+                                swal.close();
+                                return;
+                            }
 
-                        self.showError(
-                            "خطا در اجرای تطبیق خودکار."
-                        );
+                            var results =
+                                response.Result || [];
 
-                    });
+                            var matched = 0;
+
+                            $.each(
+                                results,
+                                function (_, item) {
+
+                                    if (item.Matched) {
+                                        matched++;
+                                    }
+
+                                }
+                            );
+
+                            self.reloadBankTable();
+                            self.reloadCandidateTable();
+
+                            swal({
+                                title: 'تطبیق خودکار انجام شد',
+                                text:
+                                    matched +
+                                    " تراکنش به صورت خودکار تطبیق داده شد.",
+                                type: 'success',
+                                confirmButtonText: 'باشه',
+                                confirmButtonClass: 'btn btn-success',
+                                buttonsStyling: false,
+                                background: 'rgba(255, 255, 255, 1)'
+                            });
+
+                        })
+                        .fail(function () {
+
+                            swal({
+                                title: 'خطا',
+                                text: 'خطا در اجرای تطبیق خودکار.',
+                                type: 'error',
+                                confirmButtonText: 'باشه',
+                                confirmButtonClass: 'btn btn-danger',
+                                buttonsStyling: false,
+                                background: 'rgba(255, 255, 255, 1)'
+                            });
+
+                        });
+
+                }, 100);
 
             });
 
