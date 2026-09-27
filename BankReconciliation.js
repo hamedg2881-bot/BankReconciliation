@@ -182,6 +182,8 @@
                     textFormat: "yyyy/MM/dd",
                     isGregorian: false
                 });
+
+                BankReconciliation.initDateClearButtons();
             });
 
             this.initDateClearButtons();
@@ -2139,6 +2141,7 @@
                     pageLength: 10,
                     pagingType: "simple_numbers",
                     autoWidth: false,
+                    scrollX: false,
                     dom: "rt<'row'<'col'l><'col'p><'col'i>>",
                     select: false,
                     language: dataTablesCurrentLanguage,
@@ -2205,11 +2208,13 @@
                         {
                             data: "BankAccountTitle",
                             name: "BankAccountTitle",
+                            width: "26%",
                             className: "text-center"
                         },
                         {
                             data: "FromDate",
                             name: "FromDate",
+                            width: "17%",
                             className: "text-center",
                             render: function (data) {
                                 return self.escapeHtml(self.formatDate(data));
@@ -2218,6 +2223,7 @@
                         {
                             data: "ToDate",
                             name: "ToDate",
+                            width: "17%",
                             className: "text-center",
                             render: function (data) {
                                 return self.escapeHtml(self.formatDate(data));
@@ -2226,6 +2232,7 @@
                         {
                             data: "State",
                             name: "State",
+                            width: "15%",
                             className: "text-center",
                             render: function (data) {
                                 return Number(data) === 1
@@ -2235,6 +2242,7 @@
                         },
                         {
                             data: null,
+                            width: "25%",
                             className: "text-center",
                             orderable: false,
                             render: function (data, type, row) {
