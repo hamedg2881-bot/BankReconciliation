@@ -1186,6 +1186,9 @@ namespace CDS.BIMS.Application.Service.Financial
 
                 var fromDate = reconciliation.FromDate.Date;
                 var toDate = reconciliation.ToDate.Date.AddDays(1);
+                var candidateFromDate = reconciliation.FromDate.Date.AddDays(-2);
+                var candidateToDate = reconciliation.ToDate.Date.AddDays(3);
+                var centerId = reconciliation.BankAccount.CenterId.Value;
 
                 var transactions =
                     _bankTransactionRepository.Query
