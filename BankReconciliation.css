@@ -404,7 +404,40 @@
         line-height: 1.3;
     }
 
-    #bankReconciliationArea .br-description {
+    #bankReconciliationArea .br-date-filter-wrap {
+    position: relative;
+}
+
+#bankReconciliationArea .br-date-filter-wrap .br-date-clear {
+    position: absolute;
+    top: 50%;
+    left: 4px;
+    transform: translateY(-50%);
+    z-index: 3;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #999;
+    line-height: 22px;
+    text-align: center;
+    cursor: pointer;
+}
+
+#bankReconciliationArea .br-date-filter-wrap .br-date-clear:hover {
+    color: #263963;
+}
+
+#bankReconciliationArea .br-date-filter-wrap input {
+    padding-left: 28px;
+}
+
+#bankReconciliationArea .br-history-table-responsive .br-date-filter-wrap input {
+    padding-left: 24px;
+}
+
+#bankReconciliationArea .br-description {
         max-width: 300px;
         overflow: hidden;
         text-overflow: ellipsis;
