@@ -1637,7 +1637,31 @@ namespace CDS.BIMS.Application.Service.Financial
 
         private bool TryParseFilterDate(string value, out DateTime date)
         {
+            value = (value ?? "")
+                .Trim()
+                .Replace('۰', '0')
+                .Replace('۱', '1')
+                .Replace('۲', '2')
+                .Replace('۳', '3')
+                .Replace('۴', '4')
+                .Replace('۵', '5')
+                .Replace('۶', '6')
+                .Replace('۷', '7')
+                .Replace('۸', '8')
+                .Replace('۹', '9')
+                .Replace('٠', '0')
+                .Replace('١', '1')
+                .Replace('٢', '2')
+                .Replace('٣', '3')
+                .Replace('٤', '4')
+                .Replace('٥', '5')
+                .Replace('٦', '6')
+                .Replace('٧', '7')
+                .Replace('٨', '8')
+                .Replace('٩', '9');
+
             var formats = new[] { "yyyy/MM/dd", "yyyy-MM-dd", "yyyy/M/d", "yyyy-M-d" };
+
             if (DateTime.TryParseExact(value, formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out date))
             {
                 if (date.Year >= 1200 && date.Year <= 1700)
@@ -1646,8 +1670,10 @@ namespace CDS.BIMS.Application.Service.Financial
                     try { date = calendar.ToDateTime(date.Year, date.Month, date.Day, 0, 0, 0, 0); }
                     catch { return false; }
                 }
+
                 return true;
             }
+
             date = default(DateTime);
             return false;
         }
