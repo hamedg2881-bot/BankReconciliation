@@ -865,8 +865,19 @@
 }
 
 #bankReconciliationArea #reconciliationHistoryTable {
-    width: 100%;
+    width: 100% !important;
+    max-width: 100%;
     margin: 0;
+    table-layout: fixed;
+}
+
+#bankReconciliationArea #reconciliationHistoryTable th,
+#bankReconciliationArea #reconciliationHistoryTable td {
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 #bankReconciliationArea #reconciliationHistoryTable th,
