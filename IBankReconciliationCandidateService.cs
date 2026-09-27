@@ -1,5 +1,6 @@
 ﻿using CDS.BIMS.Application.Dto.CDSBase;
 using CDS.BIMS.Application.Dto.Financial;
+using System.Collections.Generic;
 
 namespace CDS.BIMS.Application.ServiceContract.Financial
 {
