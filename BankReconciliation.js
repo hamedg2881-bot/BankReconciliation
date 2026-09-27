@@ -423,6 +423,18 @@
 
                 drawCallback: function () {
 
+                    var hasRows = self.state.bankTable.rows({ page: "current" }).any();
+                    var emptyRow = $("#bankTransactions tbody td.dataTables_empty");
+
+                    if (!hasRows && emptyRow.length) {
+                        var message = !self.state.reconciliationId
+                            ? "ابتدا حساب بانکی و بازه تاریخ را انتخاب و نمایش کنید."
+                            : self.state.totalCount === 0
+                                ? "تراکنشی برای این مغایرت وجود ندارد."
+                                : "تراکنشی با فیلترهای انتخاب‌شده یافت نشد.";
+                        emptyRow.text(message);
+                    }
+
                     $("#bankCount")
                         .text(
                             self.formatNumber(
@@ -930,6 +942,28 @@
 
             });
 
+            $("#btnClearBankFilters").on("click", function () {
+
+                self.clearBankFilters();
+
+            });
+
+            $("#summaryMatched").closest(".br-summary-card").on("click", function () {
+                self.setBankStatus(2);
+            });
+
+            $("#summaryPartial").closest(".br-summary-card").on("click", function () {
+                self.setBankStatus(1);
+            });
+
+            $("#summaryUnmatched").closest(".br-summary-card").on("click", function () {
+                self.setBankStatus(0);
+            });
+
+            $("#summaryTotal").closest(".br-summary-card").on("click", function () {
+                self.setBankStatus(null);
+            });
+
             $("#btnRefresh").on("click", function () {
 
                 if (
@@ -990,6 +1024,42 @@
                 self.reloadCandidateTable();
 
             });
+
+        },
+
+        setBankStatus: function (status) {
+
+            if (!this.state.reconciliationId) {
+                return;
+            }
+
+            this.state.status = status;
+            $(".br-tab").removeClass("active");
+
+            var selector = status === null
+                ? '.br-tab[data-status="all"]'
+                : status === 2
+                    ? '.br-tab[data-status="matched"]'
+                    : status === 1
+                        ? '.br-tab[data-status="partial"]'
+                        : '.br-tab[data-status="unmatched"]';
+
+            $(selector).addClass("active");
+            this.reloadBankTable();
+
+            var table = $("#bankTransactions");
+            if (table.length && table.offset()) {
+                $("html, body").animate({ scrollTop: table.offset().top - 20 }, 250);
+            }
+
+        },
+
+        clearBankFilters: function () {
+
+            $("#bankReconciliationArea .br-column-filter").val("");
+            $("#txtSearch").val("");
+            this.state.search = "";
+            this.reloadBankTable();
 
         },
 
