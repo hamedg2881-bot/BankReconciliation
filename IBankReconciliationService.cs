@@ -18,7 +18,8 @@ namespace CDS.BIMS.Application.ServiceContract.Financial
 
         CDSResponse<BankReconciliationPageDto> GetPage(
             long reconciliationId,
-            BankReconciliationFilterDto filter);
+            BankReconciliationFilterDto filter,
+            Dictionary<string, string> columnFilters);
 
         CDSResponse<List<BankReconciliationMatchDto>> GetMatches(
             long reconciliationId,
