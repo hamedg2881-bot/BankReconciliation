@@ -1026,7 +1026,7 @@
 
             $("#btnMatch").prop("disabled", true);
             $("#matchScore").text("-");
-            $("#matchScoreLabel").text("میزان تطابق");
+            $("#matchScoreLabel").text("وضعیت تطبیق");
 
         },
 
@@ -1741,7 +1741,7 @@
                 .text("-");
 
             $("#matchScoreLabel")
-                .text("میزان تطابق");
+                .text("وضعیت تطبیق");
 
             $("#selectedTransactionDate")
                 .text("-");
