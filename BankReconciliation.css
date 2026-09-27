@@ -791,3 +791,28 @@
         width: 100%;
     }
 }
+
+#bankReconciliationArea.br-readonly .br-reconciliation-context {
+    background-color: rgba(176, 203, 31, .08);
+    border-color: rgba(176, 203, 31, .35);
+}
+
+#bankReconciliationArea.br-readonly .br-reconciliation-context-main i {
+    color: #1f2f52;
+}
+
+#bankReconciliationArea.br-readonly #reconciliationContextState {
+    background-color: rgba(176, 203, 31, .35);
+    color: #1f2f52;
+    font-weight: bold;
+}
+
+#bankReconciliationArea.br-readonly .br-workspace {
+    opacity: .96;
+}
+
+#bankReconciliationArea.br-readonly .br-match-actions .btn:disabled,
+#bankReconciliationArea.br-readonly #btnAutoMatch,
+#bankReconciliationArea.br-readonly #btnGroupMatch {
+    opacity: .45;
+}
