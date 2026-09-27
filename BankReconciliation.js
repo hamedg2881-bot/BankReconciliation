@@ -985,10 +985,11 @@
 
             });
 
-            $("#reconciliationHistorySearch").on("input", function () {
-
-                self.filterReconciliationHistory($(this).val());
-
+            $("#reconciliationHistoryTable").on("input change", ".br-history-column-filter", function () {
+                clearTimeout(self.historySearchTimer);
+                self.historySearchTimer = setTimeout(function () {
+                    self.reloadReconciliationHistory();
+                }, 350);
             });
 
             $("#btnChangeReconciliation").on("click", function () {
@@ -2044,128 +2045,146 @@
         loadReconciliationHistory: function () {
 
             var self = this;
-            var bankAccountId = Number($("#BankAccountId").val()) || null;
 
-            $("#reconciliationHistorySearch").val("");
-            $("#reconciliationHistoryTable tbody").html(
-                '<tr><td colspan="5" class="text-center">در حال دریافت...</td></tr>'
-            );
+            $("#reconciliationHistoryTable thead .br-history-column-filter").val("");
 
             $("#reconciliationHistoryModal").modal("show");
 
-            $.ajax({
-                url: "/BankReconciliation/GetHistory",
-                type: "GET",
-                data: {
-                    bankAccountId: bankAccountId
-                },
-                dataType: "json"
-            })
-                .done(function (response) {
+            if (!this.historyTable) {
+                this.historyTable = $("#reconciliationHistoryTable").DataTable({
+                    processing: true,
+                    serverSide: true,
+                    searching: false,
+                    ordering: false,
+                    lengthChange: true,
+                    pageLength: 10,
+                    pagingType: "simple_numbers",
+                    autoWidth: false,
+                    dom: "rt<'row'<'col'l><'col'p><'col'i>>",
+                    select: false,
+                    language: dataTablesCurrentLanguage,
+                    ajax: function (data, callback) {
 
-                    if (!self.handleResponse(response)) {
-                        return;
+                        var request = {
+                            bankAccountId: Number($("#BankAccountId").val()) || null,
+                            start: data.start,
+                            length: data.length,
+                            draw: data.draw
+                        };
+
+                        $("#reconciliationHistoryTable thead .br-history-column-filter").each(function (index) {
+                            var field = $(this).data("filter");
+                            var value = $(this).val() || "";
+
+                            request["columns[" + index + "][data]"] = field;
+                            request["columns[" + index + "][name]"] = field;
+                            request["columns[" + index + "][search][value]"] = value;
+                        });
+
+                        $.ajax({
+                            url: "/BankReconciliation/GetHistory",
+                            type: "GET",
+                            data: request,
+                            dataType: "json"
+                        })
+                            .done(function (response) {
+
+                                if (!self.handleResponse(response)) {
+                                    callback({
+                                        draw: data.draw,
+                                        recordsTotal: 0,
+                                        recordsFiltered: 0,
+                                        data: []
+                                    });
+                                    return;
+                                }
+
+                                var result = response.Result || {};
+
+                                callback({
+                                    draw: data.draw,
+                                    recordsTotal: result.TotalCount || 0,
+                                    recordsFiltered: result.TotalCount || 0,
+                                    data: result.Items || []
+                                });
+
+                            })
+                            .fail(function () {
+
+                                self.showError("خطا در دریافت سوابق مغایرت‌های بانکی.");
+
+                                callback({
+                                    draw: data.draw,
+                                    recordsTotal: 0,
+                                    recordsFiltered: 0,
+                                    data: []
+                                });
+
+                            });
+
+                    },
+                    columns: [
+                        {
+                            data: "BankAccountTitle",
+                            name: "BankAccountTitle",
+                            className: "text-center"
+                        },
+                        {
+                            data: "FromDate",
+                            name: "FromDate",
+                            className: "text-center",
+                            render: function (data) {
+                                return self.escapeHtml(self.formatDate(data));
+                            }
+                        },
+                        {
+                            data: "ToDate",
+                            name: "ToDate",
+                            className: "text-center",
+                            render: function (data) {
+                                return self.escapeHtml(self.formatDate(data));
+                            }
+                        },
+                        {
+                            data: "State",
+                            name: "State",
+                            className: "text-center",
+                            render: function (data) {
+                                return Number(data) === 1
+                                    ? '<span class="br-history-state br-history-finalized">نهایی شده</span>'
+                                    : '<span class="br-history-state br-history-open">در حال ویرایش</span>';
+                            }
+                        },
+                        {
+                            data: null,
+                            className: "text-center",
+                            orderable: false,
+                            render: function (data, type, row) {
+                                return '<button type="button" class="btn btn-sm bg-charkheh2-lighten color-charkheh1 br-history-select" data-id="' +
+                                    Number(row.Id) +
+                                    '"><i class="fas fa-folder-open ml-1"></i> انتخاب</button>';
+                            }
+                        }
+                    ],
+                    drawCallback: function () {
+                        $("#reconciliationHistoryTable .br-history-select")
+                            .off("click")
+                            .on("click", function () {
+                                self.selectReconciliation(Number($(this).data("id")));
+                            });
                     }
-
-                    self.state.reconciliationHistory =
-                        response.Result || [];
-
-                    self.renderReconciliationHistory();
-
-                })
-                .fail(function () {
-
-                    self.showError(
-                        "خطا در دریافت سوابق مغایرت‌های بانکی."
-                    );
-
                 });
-
-        },
-
-        renderReconciliationHistory: function () {
-
-            var self = this;
-            var rows = this.state.reconciliationHistory || [];
-
-            if (!rows.length) {
-                $("#reconciliationHistoryTable tbody").html(
-                    '<tr><td colspan="5" class="text-center">سابقه‌ای برای نمایش وجود ندارد.</td></tr>'
-                );
-                return;
+            } else {
+                this.historyTable.ajax.reload(null, true);
             }
 
-            var html = "";
-
-            $.each(rows, function (_, item) {
-
-                var state = Number(item.State) === 1
-                    ? '<span class="br-history-state br-history-finalized">نهایی شده</span>'
-                    : '<span class="br-history-state br-history-open">در حال ویرایش</span>';
-
-                html +=
-                    "<tr>" +
-                    "<td>" + self.escapeHtml(item.BankAccountTitle || "-") + "</td>" +
-                    "<td>" + self.escapeHtml(self.formatDate(item.FromDate)) + "</td>" +
-                    "<td>" + self.escapeHtml(self.formatDate(item.ToDate)) + "</td>" +
-                    "<td>" + state + "</td>" +
-                    '<td><button type="button" class="btn btn-sm bg-charkheh2-lighten color-charkheh1 br-history-select" data-id="' +
-                    Number(item.Id) +
-                    '"><i class="fas fa-folder-open ml-1"></i> انتخاب</button></td>' +
-                    "</tr>";
-
-            });
-
-            $("#reconciliationHistoryTable tbody").html(html);
-
-            $("#reconciliationHistoryTable .br-history-select")
-                .on("click", function () {
-
-                    self.selectReconciliation(
-                        Number($(this).data("id"))
-                    );
-
-                });
-
         },
 
-        filterReconciliationHistory: function (value) {
+        reloadReconciliationHistory: function () {
 
-            var search = (value || "").trim().toLowerCase();
-
-            $("#reconciliationHistoryTable tbody tr").each(function () {
-
-                var row = $(this);
-
-                if (!search) {
-                    row.show();
-                    return;
-                }
-
-                row.toggle(
-                    row.find("td").map(function () {
-                        return $(this).text();
-                    }).get().join(" ").toLowerCase().indexOf(search) >= 0
-                );
-
-            });
-
-        },
-
-        setDateInputValue: function (selector, value) {
-
-            var input = $(selector);
-
-            input
-                .val(value || "")
-                .trigger("input")
-                .trigger("change")
-                .trigger("blur");
-
-            input
-                .closest(".md-form")
-                .find("label")
-                .toggleClass("active", !!value);
+            if (this.historyTable) {
+                this.historyTable.ajax.reload(null, true);
+            }
 
         },
 
