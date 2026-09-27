@@ -9,6 +9,7 @@ namespace CDS.BIMS.Application.ServiceContract.Financial
         CDSResponse<BankReconciliationCandidateResultDto> GetCandidates(
             long reconciliationId,
             long bankTransactionId,
-            BankReconciliationCandidateFilterDto filter);
+            BankReconciliationCandidateFilterDto filter,
+            Dictionary<string, string> columnFilters);
     }
 }
