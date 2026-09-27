@@ -36,6 +36,12 @@ namespace CDS.BIMS.Application.Dto.Financial
         public DateTime? FinalizedDate { get; set; }
     }
 
+    public class BankReconciliationHistoryPageDto
+    {
+        public List<BankReconciliationHistoryDto> Items { get; set; }
+        public int TotalCount { get; set; }
+    }
+
     public class BankReconciliationTransactionDto
     {
         public long Id { get; set; }
