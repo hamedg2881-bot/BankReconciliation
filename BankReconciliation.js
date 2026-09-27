@@ -19,6 +19,7 @@
             totalCount: 0,
             totalPages: 0,
             reconciliationState: 0,
+            reconciliationHistory: [],
             bankTable: null,
             candidateTable: null
         },
@@ -975,6 +976,18 @@
                 self.resetSelection();
 
                 self.createReconciliation();
+
+            });
+
+            $("#btnHistory").on("click", function () {
+
+                self.loadReconciliationHistory();
+
+            });
+
+            $("#reconciliationHistorySearch").on("input", function () {
+
+                self.filterReconciliationHistory($(this).val());
 
             });
 
@@ -2025,6 +2038,195 @@
 
             $("#selectedTransactionRemaining")
                 .text("-");
+
+        },
+
+        loadReconciliationHistory: function () {
+
+            var self = this;
+            var bankAccountId = Number($("#BankAccountId").val()) || null;
+
+            $("#reconciliationHistorySearch").val("");
+            $("#reconciliationHistoryTable tbody").html(
+                '<tr><td colspan="5" class="text-center">در حال دریافت...</td></tr>'
+            );
+
+            $("#reconciliationHistoryModal").modal("show");
+
+            $.ajax({
+                url: "/BankReconciliation/GetHistory",
+                type: "GET",
+                data: {
+                    bankAccountId: bankAccountId
+                },
+                dataType: "json"
+            })
+                .done(function (response) {
+
+                    if (!self.handleResponse(response)) {
+                        return;
+                    }
+
+                    self.state.reconciliationHistory =
+                        response.Result || [];
+
+                    self.renderReconciliationHistory();
+
+                })
+                .fail(function () {
+
+                    self.showError(
+                        "خطا در دریافت سوابق مغایرت‌های بانکی."
+                    );
+
+                });
+
+        },
+
+        renderReconciliationHistory: function () {
+
+            var rows = this.state.reconciliationHistory || [];
+
+            if (!rows.length) {
+                $("#reconciliationHistoryTable tbody").html(
+                    '<tr><td colspan="5" class="text-center">سابقه‌ای برای نمایش وجود ندارد.</td></tr>'
+                );
+                return;
+            }
+
+            var html = "";
+
+            $.each(rows, function (_, item) {
+
+                var state = Number(item.State) === 1
+                    ? '<span class="br-history-state br-history-finalized">نهایی شده</span>'
+                    : '<span class="br-history-state br-history-open">در حال ویرایش</span>';
+
+                html +=
+                    "<tr>" +
+                    "<td>" + self.escapeHtml(item.BankAccountTitle || "-") + "</td>" +
+                    "<td>" + self.escapeHtml(self.formatDate(item.FromDate)) + "</td>" +
+                    "<td>" + self.escapeHtml(self.formatDate(item.ToDate)) + "</td>" +
+                    "<td>" + state + "</td>" +
+                    '<td><button type="button" class="btn btn-sm bg-charkheh2-lighten color-charkheh1 br-history-select" data-id="' +
+                    Number(item.Id) +
+                    '"><i class="fas fa-folder-open ml-1"></i> انتخاب</button></td>' +
+                    "</tr>";
+
+            });
+
+            $("#reconciliationHistoryTable tbody").html(html);
+
+            $("#reconciliationHistoryTable .br-history-select")
+                .on("click", function () {
+
+                    self.selectReconciliation(
+                        Number($(this).data("id"))
+                    );
+
+                });
+
+        },
+
+        filterReconciliationHistory: function (value) {
+
+            var search = (value || "").trim().toLowerCase();
+
+            $("#reconciliationHistoryTable tbody tr").each(function () {
+
+                var row = $(this);
+
+                if (!search) {
+                    row.show();
+                    return;
+                }
+
+                row.toggle(
+                    row.find("td:first").text().toLowerCase().indexOf(search) >= 0
+                );
+
+            });
+
+        },
+
+        selectReconciliation: function (reconciliationId) {
+
+            var self = this;
+
+            if (!reconciliationId) {
+                return;
+            }
+
+            $.ajax({
+                url: "/BankReconciliation/Get",
+                type: "GET",
+                data: {
+                    id: reconciliationId
+                },
+                dataType: "json"
+            })
+                .done(function (response) {
+
+                    if (!self.handleResponse(response)) {
+                        return;
+                    }
+
+                    var reconciliation =
+                        response.Result;
+
+                    if (!reconciliation) {
+                        self.showError(
+                            "مغایرت بانکی مورد نظر یافت نشد."
+                        );
+                        return;
+                    }
+
+                    var option = new Option(
+                        reconciliation.BankAccountTitle || "حساب بانکی",
+                        reconciliation.BankAccountId,
+                        true,
+                        true
+                    );
+
+                    $("#BankAccountId")
+                        .empty()
+                        .append(option)
+                        .trigger("change");
+
+                    $("#FromDate")
+                        .val(self.formatDate(reconciliation.FromDate));
+
+                    $("#ToDate")
+                        .val(self.formatDate(reconciliation.ToDate));
+
+                    self.state.reconciliationId =
+                        Number(reconciliation.Id);
+
+                    self.state.reconciliationState =
+                        Number(reconciliation.State);
+
+                    self.state.page = 1;
+                    self.state.status = null;
+                    self.state.search = "";
+
+                    $("#txtSearch").val("");
+
+                    self.resetSelection();
+                    self.renderReconciliationContext(reconciliation);
+                    self.updateButtons();
+                    self.reloadBankTable();
+                    self.reloadCandidateTable();
+
+                    $("#reconciliationHistoryModal").modal("hide");
+
+                })
+                .fail(function () {
+
+                    self.showError(
+                        "خطا در دریافت مغایرت بانکی."
+                    );
+
+                });
 
         },
 
