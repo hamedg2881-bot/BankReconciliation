@@ -1075,10 +1075,16 @@
                 .prop("disabled", true);
 
             $("#btnOtherMatch")
-                .prop("disabled", false);
+                .prop(
+                    "disabled",
+                    Number(this.state.reconciliationState) === 1
+                );
 
             $("#btnRemoveMatch")
-                .prop("disabled", false);
+                .prop(
+                    "disabled",
+                    Number(this.state.reconciliationState) === 1
+                );
 
             $("#matchScore")
                 .text("-");
@@ -1833,6 +1839,12 @@
             $("#reconciliationContext")
                 .removeClass("d-none");
 
+            $("#bankReconciliationArea")
+                .toggleClass(
+                    "br-readonly",
+                    Number(reconciliation.State) === 1
+                );
+
             $("#BankAccountId")
                 .prop("disabled", true);
 
@@ -1874,6 +1886,12 @@
                 .prop(
                     "disabled",
                     !active || finalized
+                );
+
+            $("#btnMatch, #btnOtherMatch, #btnGroupMatch, #btnRemoveMatch")
+                .prop(
+                    "disabled",
+                    finalized
                 );
 
         },
