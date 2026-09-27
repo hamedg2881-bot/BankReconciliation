@@ -972,3 +972,50 @@
     background-color: rgba(38, 57, 99, .1);
     color: #263963;
 }
+#bankReconciliationArea .br-candidates-card .card-header {
+    min-height: 38px;
+    gap: 10px;
+}
+
+#bankReconciliationArea .br-candidates-card .card-header > div {
+    flex: 0 0 auto;
+}
+
+#bankReconciliationArea .br-candidates-card .br-date-tolerance {
+    width: 125px;
+    min-width: 125px;
+    height: 30px;
+    padding: 2px 8px;
+    font-size: 12px;
+    line-height: 1.5;
+    border-radius: 3px;
+}
+
+#bankReconciliationArea .br-candidates-card .card-header label[for="candidateDateTolerance"] {
+    font-size: 11px;
+    white-space: nowrap;
+    line-height: 30px;
+}
+
+#bankReconciliationArea .br-candidates-card .card-header #candidateCount {
+    min-width: 32px;
+    height: 24px;
+    padding: 3px 7px;
+    font-size: 11px;
+    line-height: 18px;
+    text-align: center;
+}
+
+@media (max-width: 575px) {
+    #bankReconciliationArea .br-candidates-card .card-header {
+        flex-wrap: wrap;
+    }
+
+    #bankReconciliationArea .br-candidates-card .card-header > h6 {
+        flex: 1 1 100%;
+    }
+
+    #bankReconciliationArea .br-candidates-card .card-header > div {
+        margin-right: auto;
+    }
+}
