@@ -162,7 +162,15 @@
 
         initColumnFilters: function () {
 
-            $("#bankFilterTransactionDate, #candidateFilterAccountingDocDate").MdPersianDateTimePicker({
+            $("#bankFilterTransactionDate").MdPersianDateTimePicker({
+                targetTextSelector: "#bankFilterTransactionDate",
+                enableTimePicker: false,
+                textFormat: "yyyy/MM/dd",
+                isGregorian: false
+            });
+
+            $("#candidateFilterAccountingDocDate").MdPersianDateTimePicker({
+                targetTextSelector: "#candidateFilterAccountingDocDate",
                 enableTimePicker: false,
                 textFormat: "yyyy/MM/dd",
                 isGregorian: false
@@ -2158,7 +2166,11 @@
                             var index = $(this).closest("th").index();
 
                             if (data.columns[index]) {
-                                data.columns[index].search.value = $(this).val() || "";
+                                data.columns[index].search.value =
+                                    ($(this).data("filter") === "FromDate" ||
+                                     $(this).data("filter") === "ToDate")
+                                        ? self.getDateFilterValue("#historyFilter" + $(this).data("filter"))
+                                        : $(this).val() || "";
                             }
                         });
 
@@ -2573,12 +2585,34 @@
                 return;
             }
 
-            input.val(value || "").trigger("input").trigger("change");
+            var date = null;
+
+            if (typeof value === "string" && value.indexOf("/Date(") === 0) {
+                var timestamp = parseInt(
+                    value.replace("/Date(", "").replace(")/", ""),
+                    10
+                );
+
+                if (!isNaN(timestamp)) {
+                    date = new Date(timestamp);
+                }
+            }
+
+            if (date) {
+                try {
+                    input.MdPersianDateTimePicker("setDate", date);
+                } catch (e) {
+                }
+            } else {
+                input.val(value || "");
+            }
+
+            input.trigger("input").trigger("change");
 
             input
                 .closest(".md-form")
                 .find("label")
-                .toggleClass("active", !!value);
+                .toggleClass("active", !!input.val());
         },
 
         getDateFilterValue: function (selector) {
@@ -2593,36 +2627,37 @@
                 var date = input.MdPersianDateTimePicker("getDate");
 
                 if (date && !isNaN(date.getTime())) {
-                    var value;
+                    var parts = new Intl.DateTimeFormat(
+                        "en-US-u-ca-persian",
+                        {
+                            year: "numeric",
+                            month: "2-digit",
+                            day: "2-digit"
+                        }
+                    ).formatToParts(date);
 
-                    if (window.MdsPersianDateTimePicker &&
-                        typeof MdsPersianDateTimePicker.convertDateToString === "function") {
-                        value = MdsPersianDateTimePicker.convertDateToString(
-                            date,
-                            false,
-                            "yyyy/MM/dd");
-                    } else {
-                        value = input.val();
+                    var year = "";
+                    var month = "";
+                    var day = "";
+
+                    parts.forEach(function (part) {
+                        if (part.type === "year") {
+                            year = part.value;
+                        } else if (part.type === "month") {
+                            month = part.value;
+                        } else if (part.type === "day") {
+                            day = part.value;
+                        }
+                    });
+
+                    if (year && month && day) {
+                        return year + "/" + month + "/" + day;
                     }
-
-                    return value
-                        .replace(/[۰-۹]/g, function (digit) {
-                            return "۰۱۲۳۴۵۶۷۸۹".indexOf(digit);
-                        })
-                        .replace(/[٠-٩]/g, function (digit) {
-                            return "٠١٢٣٤٥٦٧٨٩".indexOf(digit);
-                        });
                 }
             } catch (e) {
             }
 
-            return input.val()
-                .replace(/[۰-۹]/g, function (digit) {
-                    return "۰۱۲۳۴۵۶۷۸۹".indexOf(digit);
-                })
-                .replace(/[٠-٩]/g, function (digit) {
-                    return "٠١٢٣٤٥٦٧٨٩".indexOf(digit);
-                });
+            return "";
         },
 
         formatDate: function (value) {
