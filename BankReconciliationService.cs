@@ -1223,14 +1223,15 @@ namespace CDS.BIMS.Application.Service.Financial
                         continue;
                     }
 
+                    var fromDate = transaction.TransactionDate.Date.AddDays(-2);
+                    var toDate = transaction.TransactionDate.Date.AddDays(3);
+
                     var details =
                         _accountingDocDetailRepository.Query
                             .Where(x =>
                                 allowedAccountIds.Contains(x.AccountId) &&
-                                x.AccountingDoc.AccountingDocDate >=
-                                    transaction.TransactionDate.Date.AddDays(-2) &&
-                                x.AccountingDoc.AccountingDocDate <
-                                    transaction.TransactionDate.Date.AddDays(3) &&
+                                x.AccountingDoc.AccountingDocDate >= fromDate &&
+                                x.AccountingDoc.AccountingDocDate < toDate &&
                                 x.AccountingDocDetailCenters.Any(
                                     c => c.CenterId ==
                                          reconciliation.BankAccount.CenterId.Value))
