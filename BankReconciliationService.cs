@@ -270,6 +270,9 @@ namespace CDS.BIMS.Application.Service.Financial
 
                 var fromDate = reconciliation.FromDate.Date;
                 var toDate = reconciliation.ToDate.Date.AddDays(1);
+                var candidateFromDate = reconciliation.FromDate.Date.AddDays(-2);
+                var candidateToDate = reconciliation.ToDate.Date.AddDays(3);
+                var centerId = reconciliation.BankAccount.CenterId.Value;
 
                 var transactionQuery =
                     _bankTransactionRepository.Query.Where(x =>
@@ -828,11 +831,11 @@ namespace CDS.BIMS.Application.Service.Financial
                             MatchType =
                                 BankReconciliationMatchType.Group,
                             MatchDate =
-                                DateTime.Now,
+                                now,
                             CreatorUserId =
                                 userId,
                             CreateDate =
-                                DateTime.Now,
+                                now,
                             EntityState =
                                 EntityStates.Added
                         });
@@ -1265,45 +1268,41 @@ namespace CDS.BIMS.Application.Service.Financial
 
                     foreach (var detail in details)
                     {
-                        if (!IsOppositeDirection(
-                                transaction,
-                                detail))
+                        if (!IsOppositeDirection(transaction, detail))
                             continue;
 
-                        var validation =
-                            ValidateAccountingDetail(
-                                detail,
-                                reconciliation,
-                                transaction);
+                        var dateDifference =
+                            Math.Abs(
+                                (detail.AccountingDoc.AccountingDocDate.Date -
+                                 transaction.TransactionDate.Date).Days);
 
-                        if (!validation.Valid)
+                        if (dateDifference > 2)
                             continue;
+
+                        decimal accountingMatchedAmount;
+                        if (!accountingMatchedAmounts.TryGetValue(
+                                detail.Id,
+                                out accountingMatchedAmount))
+                        {
+                            accountingMatchedAmount = 0;
+                        }
 
                         var remaining =
-                            GetRemainingAccountingAmount(detail);
+                            GetAmount(detail) - accountingMatchedAmount;
 
-                        if (remaining <= 0)
-                            continue;
-
-                        if (remaining != bankRemaining)
+                        if (remaining <= 0 || remaining != bankRemaining)
                             continue;
 
                         var tracking =
                             GetTrackingNumber(detail);
 
-                        if (string.IsNullOrWhiteSpace(
-                                transaction.TrackingNumber))
-                            continue;
-
-                        if (string.IsNullOrWhiteSpace(tracking))
-                            continue;
-
-                        if (transaction.TrackingNumber != tracking)
+                        if (string.IsNullOrWhiteSpace(transaction.TrackingNumber) ||
+                            string.IsNullOrWhiteSpace(tracking) ||
+                            transaction.TrackingNumber != tracking)
                             continue;
 
                         validCandidates.Add(detail);
                     }
-
                     if (validCandidates.Count != 1)
                     {
                         results.Add(new BankReconciliationAutoMatchResultDto
