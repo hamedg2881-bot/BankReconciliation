@@ -894,6 +894,23 @@
                     return;
                 }
 
+                if (Number(self.state.candidateMode) === 2) {
+                    $.each(indexes, function (_, index) {
+                        var data = dt.row(index).data();
+                        if (!data) {
+                            return;
+                        }
+
+                        var id = Number(data.AccountingDocDetailId);
+                        if (self.state.selectedAccountingDetailIds.indexOf(id) < 0) {
+                            self.state.selectedAccountingDetailIds.push(id);
+                        }
+                    });
+
+                    self.updateGroupMatchState();
+                    return;
+                }
+
                 var data = dt.row(indexes[0]).data();
 
                 if (!data) {
@@ -919,6 +936,15 @@
             self.state.candidateTable.on("deselect.dt", function (e, dt, type) {
 
                 if (type !== "row") {
+                    return;
+                }
+
+                if (Number(self.state.candidateMode) === 2) {
+                    $.each(dt.rows({ selected: false }).indexes(), function () {});
+                    self.state.selectedAccountingDetailIds = dt.rows({ selected: true }).data().toArray().map(function (x) {
+                        return Number(x.AccountingDocDetailId);
+                    });
+                    self.updateGroupMatchState();
                     return;
                 }
 
@@ -1026,9 +1052,7 @@
 
             $("#btnGroupMatch").on("click", function () {
 
-                if (
-                    !self.state.selectedBankTransactionId
-                ) {
+                if (!self.state.selectedBankTransactionId) {
 
                     self.showError(
                         "ابتدا یک تراکنش بانکی را انتخاب کنید."
@@ -1037,11 +1061,153 @@
                     return;
                 }
 
-                self.state.candidateMode = 2;
+                if (Number(self.state.candidateMode) !== 2) {
 
-                self.reloadCandidateTable();
+                    self.state.candidateMode = 2;
+                    self.state.selectedAccountingDetailIds = [];
+
+                    self.state.candidateTable
+                        .rows()
+                        .deselect();
+
+                    self.state.candidateTable
+                        .select
+                        .style("multi");
+
+                    self.updateGroupMatchState();
+                    self.reloadCandidateTable();
+
+                    return;
+                }
+
+                self.groupBankToDetails();
 
             });
+
+        },
+
+        updateGroupMatchState: function () {
+
+            var finalized =
+                Number(this.state.reconciliationState) === 1;
+
+            var count =
+                this.state.selectedAccountingDetailIds.length;
+
+            if (Number(this.state.candidateMode) !== 2) {
+                $("#btnGroupMatch")
+                    .text("")
+                    .append('<i class="fas fa-object-group ml-1"></i>')
+                    .append("تطبیق گروهی")
+                    .prop("disabled", !this.state.reconciliationId || finalized);
+                return;
+            }
+
+            $("#btnGroupMatch")
+                .text("")
+                .append('<i class="fas fa-check-double ml-1"></i>')
+                .append(count ? "ثبت تطبیق گروهی (" + count + ")" : "ثبت تطبیق گروهی")
+                .prop("disabled", finalized || count < 2);
+
+            if (!count) {
+                $("#matchScoreLabel").text("تطبیق گروهی");
+                $("#matchScore").text("-");
+                return;
+            }
+
+            var total = 0;
+
+            this.state.candidateTable
+                .rows({ selected: true })
+                .data()
+                .each(function (item) {
+                    total += Number(item.RemainingAmount) || 0;
+                });
+
+            var transaction = this.state.bankTable
+                .row(".selected")
+                .data();
+
+            var bankRemaining = transaction
+                ? Number(transaction.RemainingAmount) || 0
+                : 0;
+
+            var difference = bankRemaining - total;
+
+            $("#matchScoreLabel").text("اختلاف گروهی");
+            $("#matchScore").text(this.formatAmount(Math.abs(difference)));
+
+        },
+
+        groupBankToDetails: function () {
+
+            var self = this;
+            var ids = this.state.selectedAccountingDetailIds.slice();
+
+            if (!this.state.selectedBankTransactionId || ids.length < 2) {
+                return;
+            }
+
+            var transaction = this.state.bankTable
+                .row(".selected")
+                .data();
+
+            var bankRemaining = transaction
+                ? Number(transaction.RemainingAmount) || 0
+                : 0;
+
+            var total = 0;
+
+            this.state.candidateTable
+                .rows({ selected: true })
+                .data()
+                .each(function (item) {
+                    total += Number(item.RemainingAmount) || 0;
+                });
+
+            if (Math.abs(bankRemaining - total) > 0.000001) {
+                this.showError("مبلغ تراکنش بانکی و مجموع اسناد انتخاب‌شده برابر نیست.");
+                return;
+            }
+
+            if (!confirm("تطبیق گروهی " + ids.length + " سند مالی با این تراکنش ثبت شود؟")) {
+                return;
+            }
+
+            $("#btnGroupMatch").prop("disabled", true);
+
+            $.ajax({
+                url: "/BankReconciliation/GroupBankToDetails",
+                type: "POST",
+                data: {
+                    ReconciliationId: self.state.reconciliationId,
+                    BankTransactionId: self.state.selectedBankTransactionId,
+                    AccountingDocDetailIds: ids
+                },
+                dataType: "json"
+            })
+                .done(function (response) {
+
+                    if (!self.handleResponse(response)) {
+                        return;
+                    }
+
+                    self.showSuccess(
+                        response.Message ||
+                        "تطبیق گروهی با موفقیت ثبت شد."
+                    );
+
+                    self.resetSelection();
+                    self.reloadBankTable();
+                    self.reloadCandidateTable();
+
+                })
+                .fail(function () {
+                    self.showError("خطا در ثبت تطبیق گروهی.");
+                })
+                .always(function () {
+                    self.updateGroupMatchState();
+                });
 
         },
 
@@ -1090,11 +1256,16 @@
             this.state.candidateMode = 1;
 
             if (this.state.candidateTable) {
+                this.state.candidateTable.select.style("single");
                 this.state.candidateTable.rows().deselect();
             }
 
             $("#btnMatch").prop("disabled", true);
             $("#btnOtherMatch").prop("disabled", true);
+            $("#btnGroupMatch")
+                .text("")
+                .append('<i class="fas fa-object-group ml-1"></i>')
+                .append("تطبیق گروهی");
             $("#btnRemoveMatch").prop("disabled", true);
             $("#matchScore").text("-");
             $("#matchScoreLabel").text("وضعیت تطبیق");
@@ -1111,6 +1282,10 @@
 
             this.state.selectedAccountingDetailId = null;
             this.state.selectedAccountingDetailIds = [];
+
+            if (this.state.candidateTable && Number(this.state.candidateMode) !== 2) {
+                this.state.candidateTable.select.style("single");
+            }
 
             $("#btnMatch").prop("disabled", true);
             $("#matchScore").text("-");
@@ -1136,6 +1311,10 @@
                 [];
 
             this.state.candidateMode = 1;
+
+            if (this.state.candidateTable) {
+                this.state.candidateTable.select.style("single");
+            }
 
             selectedTransaction =
                 this.state.bankTable
@@ -1981,6 +2160,10 @@
                     "disabled",
                     finalized
                 );
+
+            if (Number(this.state.candidateMode) === 2) {
+                this.updateGroupMatchState();
+            }
 
         },
 
