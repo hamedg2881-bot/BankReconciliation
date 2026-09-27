@@ -17,8 +17,6 @@ namespace CDS.BIMS.Application.Dto.Financial
         public int? CenterId { get; set; }
         public string CenterTitle { get; set; }
 
-        public string CounterpartCenterTitle { get; set; }
-
         public DateTime FromDate { get; set; }
         public DateTime ToDate { get; set; }
 
