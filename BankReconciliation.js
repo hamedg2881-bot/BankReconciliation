@@ -107,7 +107,15 @@
                 isGregorian: false
             });
 
-            $("#reconciliationHistoryTable [data-filter=\"FromDate\"], #reconciliationHistoryTable [data-filter=\"ToDate\"]").MdPersianDateTimePicker({
+            $("#reconciliationHistoryTable [data-filter=\"FromDate\"]").MdPersianDateTimePicker({
+                targetTextSelector: "#reconciliationHistoryTable [data-filter=\"FromDate\"]",
+                enableTimePicker: false,
+                textFormat: "yyyy/MM/dd",
+                isGregorian: false
+            });
+
+            $("#reconciliationHistoryTable [data-filter=\"ToDate\"]").MdPersianDateTimePicker({
+                targetTextSelector: "#reconciliationHistoryTable [data-filter=\"ToDate\"]",
                 enableTimePicker: false,
                 textFormat: "yyyy/MM/dd",
                 isGregorian: false
