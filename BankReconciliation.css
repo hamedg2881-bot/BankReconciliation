@@ -317,6 +317,7 @@
 
             #bankReconciliationArea .dataTables_wrapper table.dataTable tbody td {
                 font-size: 12px;
+                text-align: center;
                 vertical-align: middle;
                 padding: .2rem .4rem;
             }
