@@ -897,10 +897,20 @@
     border-bottom: 1px solid rgba(38, 57, 99, .15);
 }
 
+#bankReconciliationArea #reconciliationHistoryModal .modal-body {
+    overflow: visible;
+}
+
+#bankReconciliationArea #reconciliationHistoryTable_wrapper {
+    width: 100%;
+    max-width: 100%;
+    overflow: visible;
+}
+
 #bankReconciliationArea #reconciliationHistoryModal .br-history-table-responsive {
     width: 100%;
     max-width: 100%;
-    overflow-x: hidden;
+    overflow: visible !important;
 }
 
 #bankReconciliationArea #reconciliationHistoryTable {
@@ -918,6 +928,14 @@
     overflow: hidden;
     overflow-wrap: anywhere;
     word-break: break-word;
+    box-sizing: border-box;
+}
+
+#bankReconciliationArea #reconciliationHistoryTable .br-history-column-filter {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 #bankReconciliationArea #reconciliationHistoryTable th,
