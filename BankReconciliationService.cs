@@ -307,6 +307,17 @@ namespace CDS.BIMS.Application.Service.Financial
                             else
                                 filteredQuery = filteredQuery.Where(x => false);
                         }
+                        else if (columnFilter.Key == "Status")
+                        {
+                            if (value == "تطبیق شده")
+                                filteredQuery = filteredQuery.Where(x => x.MatchedAmount >= x.Amount);
+                            else if (value == "نیاز به بررسی")
+                                filteredQuery = filteredQuery.Where(x => x.MatchedAmount > 0 && x.MatchedAmount < x.Amount);
+                            else if (value == "عدم تطبیق")
+                                filteredQuery = filteredQuery.Where(x => x.MatchedAmount == 0);
+                            else
+                                filteredQuery = filteredQuery.Where(x => false);
+                        }
                         else if (columnFilter.Key == "Amount" || columnFilter.Key == "Balance" || columnFilter.Key == "RemainingAmount")
                         {
                             decimal amount;
