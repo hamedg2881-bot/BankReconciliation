@@ -1858,9 +1858,24 @@
                 return;
             }
 
-            i
+            swal({
+                title: 'آیا از اجرای تطبیق خودکار اطمینان دارید؟',
+                text: 'فرآیند تطبیق خودکار برای این مغایرت اجرا خواهد شد.',
+                type: 'warning',
+                showCancelButton: true,
+                buttonsStyling: false,
+                confirmButtonClass: 'btn btn-danger',
+                confirmButtonText: 'اجرا !',
+                cancelButtonText: 'انصراف',
+                cancelButtonClass: 'btn btn-light',
+                background: 'rgba(255, 255, 255, 1)'
+            }).then(function (result) {
 
-            $.ajax({
+                if (!result.value) {
+                    return;
+                }
+
+                $.ajax({
 
                 url:
                     "/BankReconciliation/AutoMatch",
@@ -1924,9 +1939,24 @@
                 return;
             }
 
-            i
+            swal({
+                title: 'آیا از نهایی‌سازی مغایرت بانکی اطمینان دارید؟',
+                text: 'پس از نهایی‌سازی، امکان ویرایش مغایرت وجود نخواهد داشت.',
+                type: 'warning',
+                showCancelButton: true,
+                buttonsStyling: false,
+                confirmButtonClass: 'btn btn-danger',
+                confirmButtonText: 'نهایی‌سازی !',
+                cancelButtonText: 'انصراف',
+                cancelButtonClass: 'btn btn-light',
+                background: 'rgba(255, 255, 255, 1)'
+            }).then(function (result) {
 
-            $.ajax({
+                if (!result.value) {
+                    return;
+                }
+
+                $.ajax({
 
                 url:
                     "/BankReconciliation/Finalize",
