@@ -138,8 +138,11 @@ namespace CDS.BIMS.Application.Service.Financial
             }
         }
 
-        public CDSResponse<List<BankReconciliationHistoryDto>> GetHistory(
-            int? bankAccountId)
+        public CDSResponse<BankReconciliationHistoryPageDto> GetHistory(
+            int? bankAccountId,
+            int requestStart,
+            int requestLength,
+            Dictionary<string, string> columnFilters)
         {
             try
             {
@@ -150,22 +153,84 @@ namespace CDS.BIMS.Application.Service.Financial
 
                 if (bankAccountId.HasValue)
                 {
-                    query = query.Where(
-                        x => x.BankAccountId == bankAccountId.Value);
+                    query = query.Where(x => x.BankAccountId == bankAccountId.Value);
                 }
 
-                var history = query
+                var totalCount = query.Count();
+
+                if (columnFilters != null)
+                {
+                    foreach (var columnFilter in columnFilters)
+                    {
+                        var value = columnFilter.Value == null
+                            ? null
+                            : columnFilter.Value.Trim();
+
+                        if (string.IsNullOrWhiteSpace(value))
+                            continue;
+
+                        if (columnFilter.Key == "BankAccountTitle")
+                        {
+                            query = query.Where(x => x.BankAccount.Title.Contains(value));
+                        }
+                        else if (columnFilter.Key == "FromDate")
+                        {
+                            DateTime date;
+
+                            if (TryParseFilterDate(value, out date))
+                            {
+                                var nextDate = date.Date.AddDays(1);
+                                query = query.Where(x => x.FromDate >= date.Date && x.FromDate < nextDate);
+                            }
+                            else
+                            {
+                                query = query.Where(x => false);
+                            }
+                        }
+                        else if (columnFilter.Key == "ToDate")
+                        {
+                            DateTime date;
+
+                            if (TryParseFilterDate(value, out date))
+                            {
+                                var nextDate = date.Date.AddDays(1);
+                                query = query.Where(x => x.ToDate >= date.Date && x.ToDate < nextDate);
+                            }
+                            else
+                            {
+                                query = query.Where(x => false);
+                            }
+                        }
+                        else if (columnFilter.Key == "State")
+                        {
+                            int state;
+
+                            if (int.TryParse(value, out state))
+                            {
+                                query = query.Where(x => (int)x.State == state);
+                            }
+                            else
+                            {
+                                query = query.Where(x => false);
+                            }
+                        }
+                    }
+                }
+
+                var filteredCount = query.Count();
+
+                var items = query
                     .OrderByDescending(x => x.ToDate)
                     .ThenByDescending(x => x.FromDate)
                     .ThenByDescending(x => x.Id)
+                    .Skip(Math.Max(0, requestStart))
+                    .Take(requestLength <= 0 ? 10 : requestLength)
                     .ToList()
                     .Select(x => new BankReconciliationHistoryDto
                     {
                         Id = x.Id,
                         BankAccountId = x.BankAccountId,
-                        BankAccountTitle = x.BankAccount != null
-                            ? x.BankAccount.Title
-                            : null,
+                        BankAccountTitle = x.BankAccount != null ? x.BankAccount.Title : null,
                         FromDate = x.FromDate,
                         ToDate = x.ToDate,
                         State = x.State,
@@ -173,11 +238,15 @@ namespace CDS.BIMS.Application.Service.Financial
                     })
                     .ToList();
 
-                return Success(history);
+                return Success(new BankReconciliationHistoryPageDto
+                {
+                    Items = items,
+                    TotalCount = filteredCount
+                });
             }
             catch (Exception e)
             {
-                return Error<List<BankReconciliationHistoryDto>>(e.Message);
+                return Error<BankReconciliationHistoryPageDto>(e.Message);
             }
         }
 
