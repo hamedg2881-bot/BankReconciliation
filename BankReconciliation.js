@@ -1195,7 +1195,7 @@
 
                     }),
                         contentType:
-                            "application/x-www-form-urlencoded; charset=UTF-8",
+                    "application/json; charset=UTF-8",
 
                 dataType:
                     "json"
@@ -1287,7 +1287,7 @@
 
                     }),
                         contentType:
-                            "application/x-www-form-urlencoded; charset=UTF-8",
+                    "application/json; charset=UTF-8",
 
                 dataType:
                     "json"
