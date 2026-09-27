@@ -59,10 +59,25 @@ namespace CDS.BIMS.Presentation.WebUI.Controllers.Financial
         }
 
         [HttpGet]
-        public JsonResult GetHistory(int? bankAccountId)
+        public JsonResult GetHistory(
+            int? bankAccountId,
+            int start,
+            int length,
+            IDataTablesRequest request)
         {
+            var columnFilters = request.Columns
+                .Where(x => x.Search != null &&
+                            !string.IsNullOrWhiteSpace(x.Search.Value))
+                .ToDictionary(
+                    x => x.Field.Substring(x.Field.LastIndexOf('.') + 1),
+                    x => x.Search.Value);
+
             var result =
-                _bankReconciliationService.GetHistory(bankAccountId);
+                _bankReconciliationService.GetHistory(
+                    bankAccountId,
+                    start,
+                    length,
+                    columnFilters);
 
             return Json(
                 result,
