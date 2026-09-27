@@ -278,7 +278,34 @@
             border-collapse: collapse !important;
         }
 
-            #bankReconciliationArea .dataTables_wrapper table.dataTable thead th {
+            #bankReconciliationArea #bankTransactions thead th:nth-child(1),
+#bankReconciliationArea #bankTransactions tbody td:nth-child(1) { width: 5% !important; }
+
+#bankReconciliationArea #bankTransactions thead th:nth-child(2),
+#bankReconciliationArea #bankTransactions tbody td:nth-child(2) { width: 9% !important; }
+
+#bankReconciliationArea #bankTransactions thead th:nth-child(3),
+#bankReconciliationArea #bankTransactions tbody td:nth-child(3) { width: 25% !important; }
+
+#bankReconciliationArea #bankTransactions thead th:nth-child(4),
+#bankReconciliationArea #bankTransactions tbody td:nth-child(4) { width: 8% !important; }
+
+#bankReconciliationArea #bankTransactions thead th:nth-child(5),
+#bankReconciliationArea #bankTransactions tbody td:nth-child(5) { width: 11% !important; }
+
+#bankReconciliationArea #bankTransactions thead th:nth-child(6),
+#bankReconciliationArea #bankTransactions tbody td:nth-child(6) { width: 11% !important; }
+
+#bankReconciliationArea #bankTransactions thead th:nth-child(7),
+#bankReconciliationArea #bankTransactions tbody td:nth-child(7) { width: 12% !important; }
+
+#bankReconciliationArea #bankTransactions thead th:nth-child(8),
+#bankReconciliationArea #bankTransactions tbody td:nth-child(8) { width: 11% !important; }
+
+#bankReconciliationArea #bankTransactions thead th:nth-child(9),
+#bankReconciliationArea #bankTransactions tbody td:nth-child(9) { width: 8% !important; }
+
+#bankReconciliationArea .dataTables_wrapper table.dataTable thead th {
                 color: #263963;
                 font-size: 12px;
                 font-weight: bold;
