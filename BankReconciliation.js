@@ -146,35 +146,31 @@
                         headers: {
                             "RequestVerificationToken": $("#forgeryToken").val()
                         },
+                        data: (function () {
+                            data.search.value =
+                                self.state.search || "";
 
-                        data: JSON.stringify({
+                            data.reconciliationId =
+                                self.state.reconciliationId;
 
-                            reconciliationId:
-                                self.state.reconciliationId,
+                            data.status =
+                                self.state.status == null
+                                    ? ""
+                                    : self.state.status;
 
-                            filter: {
+                            $("#bankTransactions thead .br-column-filter").each(function () {
+                                var index = $(this).closest("th").index();
 
-                                Search:
-                                    self.state.search || null,
+                                if (data.columns[index]) {
+                                    data.columns[index].search.value =
+                                        $(this).val() || "";
+                                }
+                            });
 
-                                Status:
-                                    self.state.status,
-
-                                ColumnFilters:
-                                    self.getColumnFilters("#bankTransactions"),
-
-                                Page:
-                                    self.state.page,
-
-                                PageSize:
-                                    self.state.pageSize
-
-                            }
-
-                        }),
-
+                            return data;
+                        })(),
                         contentType:
-                            "application/json; charset=utf-8",
+                            "application/x-www-form-urlencoded; charset=UTF-8",
 
                         dataType:
                             "json"
@@ -262,6 +258,7 @@
 
                     {
                         data: "TransactionDate",
+                        name: "TransactionDate",
                         className: "text-center",
                         width: "95px",
                         render: function (data, type, row) {
@@ -280,6 +277,7 @@
 
                     {
                         data: "Description",
+                        name: "Description",
                         render: function (data, type, row) {
 
                             return '<div class="br-description">' +
@@ -306,6 +304,7 @@
 
                     {
                         data: "TrackingNumber",
+                        name: "TrackingNumber",
                         className: "text-center",
                         width: "130px",
                         render: function (data) {
@@ -319,6 +318,7 @@
 
                     {
                         data: "Amount",
+                        name: "Amount",
                         className: "text-left",
                         width: "130px",
                         render: function (data, type, row) {
@@ -342,6 +342,7 @@
 
                     {
                         data: "Balance",
+                        name: "Balance",
                         className: "text-left",
                         width: "140px",
                         render: function (data) {
@@ -353,6 +354,7 @@
 
                     {
                         data: "RemainingAmount",
+                        name: "RemainingAmount",
                         className: "text-left",
                         width: "140px",
                         render: function (data) {
@@ -364,6 +366,7 @@
 
                     {
                         data: "Status",
+                        name: "Status",
                         className: "text-center",
                         width: "95px",
                         render: function (data) {
@@ -457,44 +460,36 @@
                             headers: {
                                 "RequestVerificationToken": $("#forgeryToken").val()
                             },
+                            data: (function () {
+                                data.search.value = "";
 
-                            data: JSON.stringify({
+                                data.reconciliationId =
+                                    self.state.reconciliationId;
 
-                                reconciliationId:
-                                    self.state.reconciliationId,
+                                data.bankTransactionId =
+                                    self.state.selectedBankTransactionId;
 
-                                bankTransactionId:
-                                    self.state.selectedBankTransactionId,
+                                data.dateTolerance =
+                                    Number.isNaN(Number(self.state.dateTolerance))
+                                        ? 0
+                                        : Number(self.state.dateTolerance);
 
-                                filter: {
+                                data.mode =
+                                    Number(self.state.candidateMode) || 1;
 
-                                    Search: null,
+                                $("#accountingCandidates thead .br-column-filter").each(function () {
+                                    var index = $(this).closest("th").index();
 
-                                    TrackingMatched: null,
+                                    if (data.columns[index]) {
+                                        data.columns[index].search.value =
+                                            $(this).val() || "";
+                                    }
+                                });
 
-                                    ColumnFilters:
-                                        self.getColumnFilters("#accountingCandidates"),
-
-                                    DateTolerance:
-                                        Number.isNaN(Number(self.state.dateTolerance))
-                                            ? 0
-                                            : Number(self.state.dateTolerance),
-
-                                    Mode:
-                                        Number(self.state.candidateMode) || 1,
-
-                                    Page:
-                                        page,
-
-                                    PageSize:
-                                        data.length
-
-                                }
-
-                            }),
-
-                            contentType:
-                                "application/json; charset=utf-8",
+                                return data;
+                            })(),
+                        contentType:
+                            "application/x-www-form-urlencoded; charset=UTF-8",
 
                             dataType:
                                 "json"
@@ -574,6 +569,7 @@
 
                         {
                             data: "AccountingDocDate",
+                        name: "AccountingDocDate",
                             className: "text-center",
                             width: "8%",
                             render: function (data) {
@@ -587,6 +583,7 @@
 
                         {
                             data: "AccountingDocId",
+                        name: "AccountingDocId",
                             className: "text-center",
                             width: "8%",
                             render: function (data) {
@@ -598,6 +595,7 @@
 
                         {
                             data: "AccountTitle",
+                        name: "AccountTitle",
                             width: "14%",
                             render: function (data) {
 
@@ -658,6 +656,7 @@
 
                         {
                             data: "TrackingSource",
+                        name: "TrackingSource",
                             className: "text-center",
                             width: "9%",
                             render: function (data) {
@@ -704,6 +703,7 @@
                         },
 {
                             data: "AmountDifference",
+                        name: "AmountDifference",
                             className: "text-left",
                             width: "10%",
                             render: function (data) {
@@ -727,8 +727,37 @@
 
                 });
 
-            this.bindColumnFilters("#bankTransactions", this.state.bankTable);
-            this.bindColumnFilters("#accountingCandidates", this.state.candidateTable);
+            $("#bankTransactions thead .br-column-filter, #accountingCandidates thead .br-column-filter")
+                .on("keyup", function (e) {
+                    var tableId =
+                        $(this).closest("table").attr("id");
+
+                    var table =
+                        tableId === "bankTransactions"
+                            ? self.state.bankTable
+                            : self.state.candidateTable;
+
+                    if (e.key === "Enter") {
+                        table.ajax.reload(null, true);
+                        return;
+                    }
+
+                    clearTimeout(self.columnFilterTimer);
+                    self.columnFilterTimer = setTimeout(function () {
+                        table.ajax.reload(null, true);
+                    }, 400);
+                })
+                .on("change", function () {
+                    var tableId =
+                        $(this).closest("table").attr("id");
+
+                    var table =
+                        tableId === "bankTransactions"
+                            ? self.state.bankTable
+                            : self.state.candidateTable;
+
+                    table.ajax.reload(null, true);
+                });
 
             this.state.candidateTable.on("draw.dt", function () {
                 var pageInfo = self.state.candidateTable.page.info();
@@ -740,46 +769,6 @@
                     });
             });
 
-        },
-
-        getColumnFilters: function (selector) {
-
-            var filters = {};
-
-            $(selector + " thead .br-column-filter").each(function () {
-                var key = $(this).data("filter");
-                var value = $(this).val();
-
-                if (key && value != null && String(value).trim() !== "") {
-                    filters[key] = String(value).trim();
-                }
-            });
-
-            return filters;
-        },
-
-        bindColumnFilters: function (selector, table) {
-
-            var self = this;
-            var timer = null;
-
-            $(selector + " thead .br-column-filter")
-                .on("keyup", function (e) {
-
-                    if (e.key === "Enter") {
-                        clearTimeout(timer);
-                        table.ajax.reload(null, true);
-                        return;
-                    }
-
-                    clearTimeout(timer);
-                    timer = setTimeout(function () {
-                        table.ajax.reload(null, true);
-                    }, 400);
-                })
-                .on("change", function () {
-                    table.ajax.reload(null, true);
-                });
         },
 
         bindEvents: function () {
@@ -1203,9 +1192,8 @@
                             toDateValue
 
                     }),
-
-                contentType:
-                    "application/json; charset=utf-8",
+                        contentType:
+                            "application/x-www-form-urlencoded; charset=UTF-8",
 
                 dataType:
                     "json"
@@ -1296,9 +1284,8 @@
                             self.state.selectedAccountingDetailId
 
                     }),
-
-                contentType:
-                    "application/json; charset=utf-8",
+                        contentType:
+                            "application/x-www-form-urlencoded; charset=UTF-8",
 
                 dataType:
                     "json"
