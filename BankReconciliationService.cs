@@ -8,6 +8,7 @@ using CDS.Core.Domain;
 using CDS.Core.Domain.Enums;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -264,6 +265,65 @@ namespace CDS.BIMS.Application.Service.Financial
                     {
                         filteredQuery = filteredQuery.Where(x =>
                             x.MatchedAmount >= x.Amount);
+                    }
+                }
+
+                if (filter.ColumnFilters != null)
+                {
+                    foreach (var columnFilter in filter.ColumnFilters)
+                    {
+                        if (string.IsNullOrWhiteSpace(columnFilter.Value))
+                            continue;
+
+                        var value = columnFilter.Value.Trim();
+
+                        if (columnFilter.Key == "TransactionDate")
+                        {
+                            DateTime date;
+                            if (TryParseFilterDate(value, out date))
+                            {
+                                var nextDate = date.Date.AddDays(1);
+                                filteredQuery = filteredQuery.Where(x => x.Transaction.TransactionDate >= date.Date && x.Transaction.TransactionDate < nextDate);
+                            }
+                            else
+                            {
+                                filteredQuery = filteredQuery.Where(x => false);
+                            }
+                        }
+                        else if (columnFilter.Key == "Description")
+                        {
+                            filteredQuery = filteredQuery.Where(x => x.Transaction.Description != null && x.Transaction.Description.Contains(value));
+                        }
+                        else if (columnFilter.Key == "TrackingNumber")
+                        {
+                            filteredQuery = filteredQuery.Where(x => x.Transaction.TrackingNumber != null && x.Transaction.TrackingNumber.Contains(value));
+                        }
+                        else if (columnFilter.Key == "Type")
+                        {
+                            if (value == "واریز")
+                                filteredQuery = filteredQuery.Where(x => x.Transaction.Credit > 0);
+                            else if (value == "برداشت")
+                                filteredQuery = filteredQuery.Where(x => x.Transaction.Debit > 0);
+                            else
+                                filteredQuery = filteredQuery.Where(x => false);
+                        }
+                        else if (columnFilter.Key == "Amount" || columnFilter.Key == "Balance" || columnFilter.Key == "RemainingAmount")
+                        {
+                            decimal amount;
+                            if (decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out amount) || decimal.TryParse(value, NumberStyles.Number, CultureInfo.CurrentCulture, out amount))
+                            {
+                                if (columnFilter.Key == "Amount")
+                                    filteredQuery = filteredQuery.Where(x => x.Amount == amount);
+                                else if (columnFilter.Key == "Balance")
+                                    filteredQuery = filteredQuery.Where(x => x.Transaction.Balance == amount);
+                                else
+                                    filteredQuery = filteredQuery.Where(x => x.Amount - x.MatchedAmount == amount);
+                            }
+                            else
+                            {
+                                filteredQuery = filteredQuery.Where(x => false);
+                            }
+                        }
                     }
                 }
 
@@ -1437,6 +1497,23 @@ namespace CDS.BIMS.Application.Service.Financial
                 HttpContext.Current.Session["UserId"]);
         }
 
+
+        private bool TryParseFilterDate(string value, out DateTime date)
+        {
+            var formats = new[] { "yyyy/MM/dd", "yyyy-MM-dd", "yyyy/M/d", "yyyy-M-d" };
+            if (DateTime.TryParseExact(value, formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out date))
+            {
+                if (date.Year >= 1200 && date.Year <= 1700)
+                {
+                    var calendar = new PersianCalendar();
+                    try { date = calendar.ToDateTime(date.Year, date.Month, date.Day, 0, 0, 0, 0); }
+                    catch { return false; }
+                }
+                return true;
+            }
+            date = default(DateTime);
+            return false;
+        }
         private CDSResponse<T> Success<T>(T data)
         {
             return new CDSResponse<T>(
