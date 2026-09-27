@@ -2085,6 +2085,7 @@
 
         renderReconciliationHistory: function () {
 
+            var self = this;
             var rows = this.state.reconciliationHistory || [];
 
             if (!rows.length) {
