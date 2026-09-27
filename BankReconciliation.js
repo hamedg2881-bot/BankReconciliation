@@ -1873,7 +1873,7 @@
                 background: 'rgba(255, 255, 255, 1)'
             }).then(function (result) {
 
-                if (!result.value) {
+                if (!result) {
                     return;
                 }
 
@@ -1973,7 +1973,7 @@
                 background: 'rgba(255, 255, 255, 1)'
             }).then(function (result) {
 
-                if (!result.value) {
+                if (!result) {
                     return;
                 }
 
