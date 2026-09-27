@@ -816,3 +816,27 @@
 #bankReconciliationArea.br-readonly #btnGroupMatch {
     opacity: .45;
 }
+
+
+#bankReconciliationArea .br-section-tools {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+#bankReconciliationArea .br-clear-filters {
+    color: #777;
+    background-color: #f5f6f8;
+    border: 1px solid #d8dce3;
+    font-size: 9px;
+    padding: .2rem .45rem;
+}
+
+#bankReconciliationArea .br-clear-filters:hover {
+    color: #263963;
+    background-color: rgba(38, 57, 99, .08);
+}
+
+#bankReconciliationArea .br-summary-card {
+    cursor: pointer;
+}
