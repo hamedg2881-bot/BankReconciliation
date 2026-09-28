@@ -1417,6 +1417,32 @@ namespace CDS.BIMS.Application.Service.Financial
 
                     var selectedCandidate = orderedCandidates[0];
                     var topScore = selectedCandidate.Score;
+
+                    if (topScore <= 100)
+                    {
+                        results.Add(new BankReconciliationAutoMatchResultDto
+                        {
+                            BankTransactionId = transaction.Id,
+                            Matched = false,
+                            MatchedAmount = 0,
+                            Status = GetStatus(
+                                bankAmount,
+                                bankMatchedAmount),
+                            CandidateCount = orderedCandidates.Count,
+                            MatchScore = topScore,
+                            MatchScoreDetails = selectedCandidate.ScoreDetails,
+                            SecondCandidateScore = orderedCandidates.Count > 1
+                                ? orderedCandidates[1].Score
+                                : 0,
+                            ScoreDifference = orderedCandidates.Count > 1
+                                ? topScore - orderedCandidates[1].Score
+                                : topScore,
+                            Reason = "امتیاز تطبیق باید بیشتر از 100 باشد."
+                        });
+
+                        continue;
+                    }
+
                     var sameScoreCount = orderedCandidates.Count(
                         x => x.Score == topScore);
 
