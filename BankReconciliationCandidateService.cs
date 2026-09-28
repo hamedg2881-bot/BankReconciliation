@@ -495,24 +495,22 @@ namespace CDS.BIMS.Application.Service.Financial
                 }
 
                 candidates = candidates
-                    .OrderByDescending(x =>
-                        x.AmountMatched &&
-                        x.DateMatched &&
-                        x.TrackingMatched)
-                    .ThenByDescending(x =>
-                        x.AmountMatched &&
-                        x.DateMatched)
-                    .ThenByDescending(x =>
-                        x.AmountMatched &&
-                        x.TrackingMatched)
-                    .ThenByDescending(x => x.AmountMatched)
-                    .ThenByDescending(x =>
-                        x.DateMatched &&
-                        x.TrackingMatched)
-                    .ThenByDescending(x => x.DateMatched)
-                    .ThenByDescending(x => x.TrackingMatched)
-                    .ThenBy(x => x.DateDifference)
-                    .ThenBy(x => x.AmountDifference)
+                    .Select(x => new
+                    {
+                        Candidate = x,
+                        Score =
+                            (x.AmountMatched ? 100 : 0) +
+                            (x.TrackingMatched ? 50 : 0) +
+                            (ContainsText(transaction.Description, x.TrackingNumber) ? 50 : 0) +
+                            (ContainsText(transaction.Description, x.CounterpartCenterTitle) ? 30 : 0) +
+                            (x.DateDifference == 0 ? 20 : x.DateDifference == 1 ? 10 : 0)
+                    })
+                    .OrderByDescending(x => x.Score)
+                    .ThenByDescending(x => x.Candidate.AmountMatched)
+                    .ThenByDescending(x => x.Candidate.TrackingMatched)
+                    .ThenBy(x => x.Candidate.DateDifference)
+                    .ThenBy(x => x.Candidate.AmountDifference)
+                    .Select(x => x.Candidate)
                     .ToList();
 
                 result.TotalCount = candidates.Count;
@@ -575,6 +573,29 @@ namespace CDS.BIMS.Application.Service.Financial
 
             date = default(DateTime);
             return false;
+        }
+
+        private bool ContainsText(string source, string value)
+        {
+            if (string.IsNullOrWhiteSpace(source) ||
+                string.IsNullOrWhiteSpace(value))
+                return false;
+
+            var normalizedSource = NormalizeText(source);
+            var normalizedValue = NormalizeText(value);
+
+            return normalizedSource.Contains(normalizedValue);
+        }
+
+        private string NormalizeText(string value)
+        {
+            return string.Join(
+                " ",
+                value
+                    .Replace("ي", "ی")
+                    .Replace("ى", "ی")
+                    .Replace("ك", "ک")
+                    .Split((char[])null, StringSplitOptions.RemoveEmptyEntries));
         }
 
         private decimal GetAmount(BankTransaction transaction)
