@@ -1410,7 +1410,7 @@ namespace CDS.BIMS.Application.Service.Financial
                     var selectedCandidate = orderedCandidates[0];
                     var topScore = selectedCandidate.Score;
 
-                    if (topScore <= 100)
+                    if (topScore <= 120)
                     {
                         results.Add(new BankReconciliationAutoMatchResultDto
                         {
@@ -1429,7 +1429,7 @@ namespace CDS.BIMS.Application.Service.Financial
                             ScoreDifference = orderedCandidates.Count > 1
                                 ? topScore - orderedCandidates[1].Score
                                 : topScore,
-                            Reason = "امتیاز تطبیق باید بیشتر از 100 باشد."
+                            Reason = "علاوه بر مبلغ و تاریخ، معیار دیگری برای تطبیق برقرار نیست."
                         });
 
                         continue;
