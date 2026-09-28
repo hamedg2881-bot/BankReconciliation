@@ -1219,6 +1219,39 @@ namespace CDS.BIMS.Application.Service.Financial
                             x.AccountingDocDetailCenters.Any(y => y.CenterId == centerId))
                         .ToList();
 
+                var accountingDocIds = details
+                    .Select(x => x.AccountingDocId)
+                    .Distinct()
+                    .ToList();
+
+                var counterpartDetails =
+                    _accountingDocDetailRepository.Query
+                        .Include(x => x.AccountingDocDetailCenters.Select(y => y.Center))
+                        .Where(x => accountingDocIds.Contains(x.AccountingDocId))
+                        .Select(x => new
+                        {
+                            x.Id,
+                            x.AccountingDocId,
+                            CenterTitles = x.AccountingDocDetailCenters
+                                .Where(y => y.Center != null)
+                                .Select(y => y.Center.Title)
+                        })
+                        .ToList();
+
+                var counterpartCenterTitlesByDetailId =
+                    details.ToDictionary(
+                        x => x.Id,
+                        x => string.Join(
+                            "، ",
+                            counterpartDetails
+                                .Where(y =>
+                                    y.AccountingDocId == x.AccountingDocId &&
+                                    y.Id != x.Id)
+                                .SelectMany(y => y.CenterTitles)
+                                .Where(y => !string.IsNullOrWhiteSpace(y))
+                                .Distinct()
+                                .ToList()));
+
                 var detailIds = details.Select(x => x.Id).ToList();
 
                 var accountingMatchedAmounts =
@@ -1237,7 +1270,6 @@ namespace CDS.BIMS.Application.Service.Financial
                     new List<BankReconciliationAutoMatchResultDto>();
 
                 var userId = GetCurrentUserId();
-                var now = DateTime.Now;
 
                 foreach (var transaction in transactions)
                 {
@@ -1263,8 +1295,8 @@ namespace CDS.BIMS.Application.Service.Financial
                         continue;
                     }
 
-                    var validCandidates =
-                        new List<AccountingDocDetail>();
+                    var candidates =
+                        new List<AutoMatchCandidate>();
 
                     foreach (var detail in details)
                     {
@@ -1293,17 +1325,80 @@ namespace CDS.BIMS.Application.Service.Financial
                         if (remaining <= 0 || remaining != bankRemaining)
                             continue;
 
-                        var tracking =
-                            GetTrackingNumber(detail);
+                        var tracking = GetTrackingNumber(detail);
+                        var trackingMatched =
+                            !string.IsNullOrWhiteSpace(transaction.TrackingNumber) &&
+                            !string.IsNullOrWhiteSpace(tracking) &&
+                            transaction.TrackingNumber == tracking;
 
-                        if (string.IsNullOrWhiteSpace(transaction.TrackingNumber) ||
-                            string.IsNullOrWhiteSpace(tracking) ||
-                            transaction.TrackingNumber != tracking)
-                            continue;
+                        var trackingInDescription =
+                            ContainsText(transaction.Description, tracking);
 
-                        validCandidates.Add(detail);
+                        string counterpartCenterTitle;
+                        if (!counterpartCenterTitlesByDetailId.TryGetValue(
+                                detail.Id,
+                                out counterpartCenterTitle))
+                        {
+                            counterpartCenterTitle = null;
+                        }
+
+                        var counterpartCenterInDescription =
+                            ContainsAnyText(
+                                transaction.Description,
+                                counterpartCenterTitle);
+
+                        var score = 100;
+                        var scoreDetails = new List<string>
+                        {
+                            "مبلغ: +100"
+                        };
+
+                        if (trackingMatched)
+                        {
+                            score += 50;
+                            scoreDetails.Add("شماره پیگیری: +50");
+                        }
+
+                        if (trackingInDescription)
+                        {
+                            score += 50;
+                            scoreDetails.Add("پیگیری در شرح: +50");
+                        }
+
+                        if (counterpartCenterInDescription)
+                        {
+                            score += 30;
+                            scoreDetails.Add("مرکز طرف دوم در شرح: +30");
+                        }
+
+                        if (dateDifference == 0)
+                        {
+                            score += 20;
+                            scoreDetails.Add("تاریخ: +20");
+                        }
+                        else if (dateDifference == 1)
+                        {
+                            score += 10;
+                            scoreDetails.Add("اختلاف تاریخ یک روز: +10");
+                        }
+
+                        candidates.Add(new AutoMatchCandidate
+                        {
+                            Detail = detail,
+                            Score = score,
+                            ScoreDetails = string.Join("، ", scoreDetails)
+                        });
                     }
-                    if (validCandidates.Count != 1)
+
+                    var orderedCandidates = candidates
+                        .OrderByDescending(x => x.Score)
+                        .ThenBy(x => Math.Abs(
+                            (x.Detail.AccountingDoc.AccountingDocDate.Date -
+                             transaction.TransactionDate.Date).Days))
+                        .ThenBy(x => x.Detail.Id)
+                        .ToList();
+
+                    if (orderedCandidates.Count == 0)
                     {
                         results.Add(new BankReconciliationAutoMatchResultDto
                         {
@@ -1313,19 +1408,45 @@ namespace CDS.BIMS.Application.Service.Financial
                             Status = GetStatus(
                                 bankAmount,
                                 bankMatchedAmount),
-                            CandidateCount =
-                                validCandidates.Count,
-                            Reason =
-                                validCandidates.Count == 0
-                                    ? "کاندیدای معتبر یافت نشد."
-                                    : "بیش از یک کاندیدای معتبر یافت شد."
+                            CandidateCount = 0,
+                            Reason = "کاندیدای معتبر یافت نشد."
                         });
 
                         continue;
                     }
 
-                    var selected =
-                        validCandidates[0];
+                    var selectedCandidate = orderedCandidates[0];
+                    var topScore = selectedCandidate.Score;
+                    var sameScoreCount = orderedCandidates.Count(
+                        x => x.Score == topScore);
+
+                    if (sameScoreCount != 1)
+                    {
+                        results.Add(new BankReconciliationAutoMatchResultDto
+                        {
+                            BankTransactionId = transaction.Id,
+                            Matched = false,
+                            MatchedAmount = 0,
+                            Status = GetStatus(
+                                bankAmount,
+                                bankMatchedAmount),
+                            CandidateCount = orderedCandidates.Count,
+                            MatchScore = topScore,
+                            MatchScoreDetails = selectedCandidate.ScoreDetails,
+                            SecondCandidateScore = topScore,
+                            ScoreDifference = 0,
+                            Reason = "بیش از یک کاندیدای هم‌امتیاز وجود دارد."
+                        });
+
+                        continue;
+                    }
+
+                    var secondScore =
+                        orderedCandidates.Count > 1
+                            ? orderedCandidates[1].Score
+                            : 0;
+
+                    var selected = selectedCandidate.Detail;
 
                     _matchRepository.Add(
                         new BankReconciliationMatch
@@ -1375,7 +1496,16 @@ namespace CDS.BIMS.Application.Service.Financial
                             bankRemaining,
                         Status =
                             BankReconciliationStatus.Matched,
-                        CandidateCount = 1,
+                        CandidateCount =
+                            orderedCandidates.Count,
+                        MatchScore =
+                            selectedCandidate.Score,
+                        MatchScoreDetails =
+                            selectedCandidate.ScoreDetails,
+                        SecondCandidateScore =
+                            secondScore,
+                        ScoreDifference =
+                            selectedCandidate.Score - secondScore,
                         Reason =
                             "تطبیق خودکار انجام شد."
                     });
@@ -1390,6 +1520,44 @@ namespace CDS.BIMS.Application.Service.Financial
                 return Error<List<BankReconciliationAutoMatchResultDto>>(
                     e.Message);
             }
+        }
+
+        private bool ContainsAnyText(
+            string source,
+            string values)
+        {
+            if (string.IsNullOrWhiteSpace(source) ||
+                string.IsNullOrWhiteSpace(values))
+                return false;
+
+            return values
+                .Split(new[] { '،', ',' }, StringSplitOptions.RemoveEmptyEntries)
+                .Any(x => ContainsText(source, x.Trim()));
+        }
+
+        private bool ContainsText(
+            string source,
+            string value)
+        {
+            if (string.IsNullOrWhiteSpace(source) ||
+                string.IsNullOrWhiteSpace(value))
+                return false;
+
+            var normalizedSource = NormalizeText(source);
+            var normalizedValue = NormalizeText(value);
+
+            return normalizedSource.Contains(normalizedValue);
+        }
+
+        private string NormalizeText(string value)
+        {
+            return string.Join(
+                " ",
+                value
+                    .Replace("ي", "ی")
+                    .Replace("ى", "ی")
+                    .Replace("ك", "ک")
+                    .Split((char[])null, StringSplitOptions.RemoveEmptyEntries));
         }
 
         private BankReconciliation GetReconciliationForWrite(
@@ -1709,6 +1877,13 @@ namespace CDS.BIMS.Application.Service.Financial
                 ResponseStatus.Error,
                 message,
                 default(T));
+        }
+
+        private class AutoMatchCandidate
+        {
+            public AccountingDocDetail Detail { get; set; }
+            public int Score { get; set; }
+            public string ScoreDetails { get; set; }
         }
 
         private class ValidationResult
