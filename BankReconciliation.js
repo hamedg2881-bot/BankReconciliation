@@ -870,6 +870,27 @@
                                 return self.formatAmount(data);
 
                             }
+                        },
+
+                        {
+                            data: "MatchScore",
+                            name: "MatchScore",
+                            className: "text-center",
+                            width: "10%",
+                            render: function (data, type, row) {
+
+                                var score = self.formatNumber(data || 0);
+                                var details = self.escapeHtml(
+                                    row.MatchScoreDetails || ""
+                                );
+
+                                return '<span class="br-match-score-value" title="' +
+                                    details +
+                                    '">' +
+                                    score +
+                                    '</span>';
+
+                            }
                         }
 
                     ],
