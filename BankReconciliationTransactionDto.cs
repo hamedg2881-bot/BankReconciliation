@@ -262,6 +262,14 @@ namespace CDS.BIMS.Application.Dto.Financial
 
         public int CandidateCount { get; set; }
 
+        public int MatchScore { get; set; }
+
+        public string MatchScoreDetails { get; set; }
+
+        public int SecondCandidateScore { get; set; }
+
+        public int ScoreDifference { get; set; }
+
         public string Reason { get; set; }
     }
 
