@@ -148,6 +148,9 @@ namespace CDS.BIMS.Application.Dto.Financial
         public bool CanGroupMatch { get; set; }
 
         public string TrackingSource { get; set; }
+
+        public int MatchScore { get; set; }
+        public string MatchScoreDetails { get; set; }
     }
 
     public class BankReconciliationCandidateResultDto
