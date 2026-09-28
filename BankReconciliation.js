@@ -1399,6 +1399,8 @@
             $("#selectedTransactionDescription").text("تراکنشی انتخاب نشده است");
             $("#selectedTransactionAmount").text("-");
             $("#selectedTransactionRemaining").text("-");
+            $("#matchedOperations").addClass("d-none");
+            $("#matchedOperationsTable tbody").empty();
 
             this.reloadCandidateTable();
 
@@ -1486,7 +1488,84 @@
                 .text("وضعیت تطبیق");
 
             this.reloadCandidateTable();
+            this.loadMatchedOperations();
 
+        },
+
+        loadMatchedOperations: function () {
+
+            var self = this;
+            var container = $("#matchedOperations");
+            var tbody = $("#matchedOperationsTable tbody");
+
+            tbody.empty();
+            container.addClass("d-none");
+
+            if (!this.state.selectedBankTransactionId) {
+                return;
+            }
+
+            $.ajax({
+                url: "/BankReconciliation/GetMatches",
+                type: "GET",
+                data: {
+                    reconciliationId: self.state.reconciliationId,
+                    bankTransactionId: self.state.selectedBankTransactionId
+                },
+                dataType: "json"
+            })
+                .done(function (response) {
+
+                    if (!self.handleResponse(response)) {
+                        return;
+                    }
+
+                    var matches = response.Result || [];
+
+                    if (!matches.length) {
+                        return;
+                    }
+
+                    $.each(matches, function (_, item) {
+                        var row = $("<tr></tr>");
+
+                        row.append($("<td></td>").text(self.formatDate(item.AccountingDocDate)));
+                        row.append($("<td></td>").text(item.AccountingDocId || "-"));
+                        row.append($("<td></td>").text(item.AccountTitle || "-"));
+                        row.append($("<td></td>").text(item.CenterTitle || "-"));
+                        row.append($("<td></td>").text(item.Description || "-"));
+                        row.append($("<td></td>").text(item.TrackingNumber || "-"));
+                        row.append($("<td class='text-left'></td>").text(self.formatAmount(item.MatchedAmount)));
+                        row.append($("<td></td>").text(self.matchTypeTitle(item.MatchType)));
+
+                        tbody.append(row);
+                    });
+
+                    container.removeClass("d-none");
+                })
+                .fail(function () {
+                    self.showError("خطا در دریافت تطبیق‌های ثبت‌شده.");
+                });
+
+        },
+
+        matchTypeTitle: function (value) {
+
+            value = Number(value);
+
+            if (value === 1) {
+                return "دستی";
+            }
+
+            if (value === 2) {
+                return "خودکار";
+            }
+
+            if (value === 3) {
+                return "گروهی";
+            }
+
+            return "-";
         },
 
         selectAccountingDetail: function (candidate) {
@@ -1859,6 +1938,7 @@
 
                         self.reloadBankTable();
                         self.reloadCandidateTable();
+                        self.loadMatchedOperations();
 
                     })
                     .fail(function () {
