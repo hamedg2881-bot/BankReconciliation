@@ -1180,8 +1180,8 @@ namespace CDS.BIMS.Application.Service.Financial
 
                 var fromDate = reconciliation.FromDate.Date;
                 var toDate = reconciliation.ToDate.Date.AddDays(1);
-                var candidateFromDate = reconciliation.FromDate.Date.AddDays(-2);
-                var candidateToDate = reconciliation.ToDate.Date.AddDays(3);
+                var candidateFromDate = reconciliation.FromDate.Date;
+                var candidateToDate = reconciliation.ToDate.Date.AddDays(1);
                 var centerId = reconciliation.BankAccount.CenterId.Value;
 
                 var transactions =
@@ -1308,7 +1308,7 @@ namespace CDS.BIMS.Application.Service.Financial
                                 (detail.AccountingDoc.AccountingDocDate.Date -
                                  transaction.TransactionDate.Date).Days);
 
-                        if (dateDifference > 2)
+                        if (dateDifference != 0)
                             continue;
 
                         decimal accountingMatchedAmount;
@@ -1371,16 +1371,8 @@ namespace CDS.BIMS.Application.Service.Financial
                             scoreDetails.Add("مرکز طرف دوم در شرح: +30");
                         }
 
-                        if (dateDifference == 0)
-                        {
-                            score += 20;
-                            scoreDetails.Add("تاریخ: +20");
-                        }
-                        else if (dateDifference == 1)
-                        {
-                            score += 10;
-                            scoreDetails.Add("اختلاف تاریخ یک روز: +10");
-                        }
+                        score += 20;
+                        scoreDetails.Add("تاریخ: +20");
 
                         candidates.Add(new AutoMatchCandidate
                         {
