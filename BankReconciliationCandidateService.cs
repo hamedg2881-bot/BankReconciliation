@@ -495,22 +495,66 @@ namespace CDS.BIMS.Application.Service.Financial
                 }
 
                 candidates = candidates
-                    .Select(x => new
+                    .Select(x =>
                     {
-                        Candidate = x,
-                        Score =
-                            (x.AmountMatched ? 100 : 0) +
-                            (x.TrackingMatched ? 50 : 0) +
-                            (ContainsText(transaction.Description, x.TrackingNumber) ? 50 : 0) +
-                            (ContainsText(transaction.Description, x.CounterpartCenterTitle) ? 30 : 0) +
-                            (x.DateDifference == 0 ? 20 : x.DateDifference == 1 ? 10 : 0)
+                        var trackingInDescription =
+                            ContainsText(transaction.Description, x.TrackingNumber);
+
+                        var counterpartCenterInDescription =
+                            ContainsAnyText(
+                                transaction.Description,
+                                x.CounterpartCenterTitle);
+
+                        var score = 0;
+                        var scoreDetails = new List<string>();
+
+                        if (x.AmountMatched)
+                        {
+                            score += 100;
+                            scoreDetails.Add("مبلغ: +100");
+                        }
+
+                        if (x.TrackingMatched)
+                        {
+                            score += 50;
+                            scoreDetails.Add("شماره پیگیری: +50");
+                        }
+
+                        if (trackingInDescription)
+                        {
+                            score += 50;
+                            scoreDetails.Add("پیگیری در شرح: +50");
+                        }
+
+                        if (counterpartCenterInDescription)
+                        {
+                            score += 30;
+                            scoreDetails.Add("مرکز طرف دوم در شرح: +30");
+                        }
+
+                        if (x.DateDifference == 0)
+                        {
+                            score += 20;
+                            scoreDetails.Add("تاریخ: +20");
+                        }
+                        else if (x.DateDifference == 1)
+                        {
+                            score += 10;
+                            scoreDetails.Add("اختلاف تاریخ یک روز: +10");
+                        }
+
+                        x.MatchScore = score;
+                        x.MatchScoreDetails = scoreDetails.Count == 0
+                            ? "بدون امتیاز"
+                            : string.Join("، ", scoreDetails);
+
+                        return x;
                     })
-                    .OrderByDescending(x => x.Score)
-                    .ThenByDescending(x => x.Candidate.AmountMatched)
-                    .ThenByDescending(x => x.Candidate.TrackingMatched)
-                    .ThenBy(x => x.Candidate.DateDifference)
-                    .ThenBy(x => x.Candidate.AmountDifference)
-                    .Select(x => x.Candidate)
+                    .OrderByDescending(x => x.MatchScore)
+                    .ThenByDescending(x => x.AmountMatched)
+                    .ThenByDescending(x => x.TrackingMatched)
+                    .ThenBy(x => x.DateDifference)
+                    .ThenBy(x => x.AmountDifference)
                     .ToList();
 
                 result.TotalCount = candidates.Count;
@@ -573,6 +617,17 @@ namespace CDS.BIMS.Application.Service.Financial
 
             date = default(DateTime);
             return false;
+        }
+
+        private bool ContainsAnyText(string source, string values)
+        {
+            if (string.IsNullOrWhiteSpace(source) ||
+                string.IsNullOrWhiteSpace(values))
+                return false;
+
+            return values
+                .Split(new[] { '،', ',' }, StringSplitOptions.RemoveEmptyEntries)
+                .Any(x => ContainsText(source, x.Trim()));
         }
 
         private bool ContainsText(string source, string value)
