@@ -84,9 +84,9 @@ Recent file blob SHAs:
 - BankReconciliation.js: c6cfbe2549a5c5aa66941b5cbcf1d56b3773998f
 - BankReconciliation.css: 85577fc1a965e4c539a06070eed265647fb35686
 - BankReconciliationController.cs: d450938d93215d0d3f847d6e319e4314f8d2ea2f
-- BankReconciliationService.cs: c0dcca570f83bab0ccac328701d192c276e26d83
+- BankReconciliationService.cs: b0ac1b53880770c0c1c6ac95cf13d9415990029e
 - Index.cshtml: a060c593802f1bb07483a23c9d2584d46dde3e1e
-- BankReconciliationCandidateService.cs: d808f38f73b018c992aa2a69dc82be4708169e1c
+- BankReconciliationCandidateService.cs: 6fe6420edec7f12078de5c3ff5eca6aced5e000b
 
 ## Current UX Flow
 Display/Load: exact existing reconciliation -> load it; no existing reconciliation and free range -> create then load it; overlap with another reconciliation -> show error.
@@ -98,14 +98,14 @@ The user prefers minimal, incremental changes and wants the actual GitHub files 
 ### AutoMatch
 - AutoMatch is 1:1 only. AccountingDocDate must exactly equal BankTransaction.TransactionDate.
 - Direction must be opposite; remaining amounts must be equal and greater than zero.
-- Score: exact amount +100; direct tracking match +50; tracking number inside bank description +50; counterpart Center title inside bank description +30; exact date +20.
+- Score: exact amount +100; exact or partial direct tracking-number match +50; tracking number inside bank description +50; counterpart Center title inside bank description +30; exact date +20.
 - Match only if the unique top score is strictly greater than 120. Amount plus exact date scores 120 and is insufficient. If top candidates tie, do not auto-match.
 - Sort by descending score, then date difference, then accounting detail ID. Track amounts allocated during the current run; set Automatic type, MatchDate and audit fields; commit once.
 - Result DTO fields include MatchScore, MatchScoreDetails, SecondCandidateScore and ScoreDifference.
 
 ### Candidate score and text matching
-- Exact amount +100; exact tracking +50; tracking inside bank description +50; counterpart Center title inside bank description +30; exact date +20; one-day difference +10.
-- Candidate DTO includes MatchScore and MatchScoreDetails. Text matching normalizes Arabic Yeh (ي/ى) to Persian Yeh (ی), Arabic Kaf (ك) to Persian Kaf (ک), Persian/Arabic digits to English digits, and whitespace. Direct tracking-number comparison uses the same normalization in candidate scoring and AutoMatch.
+- Exact amount +100; exact or partial tracking-number match +50; tracking inside bank description +50; counterpart Center title inside bank description +30; exact date +20; one-day difference +10.
+- Candidate DTO includes MatchScore and MatchScoreDetails. Text matching normalizes Arabic Yeh (ي/ى) to Persian Yeh (ی), Arabic Kaf (ك) to Persian Kaf (ک), Persian/Arabic digits to English digits, and whitespace. Direct tracking-number comparison in candidate scoring and AutoMatch accepts exact equality or a partial match when either normalized number contains the other; empty values never count as a match.
 - Candidate date tolerance is configurable from 0 to 2 calendar days. Candidate must use an allowed account, same Center, opposite direction, and positive remaining amount. Normal mode requires exact remaining amount and CanMatch; group mode uses CanGroupMatch.
 - Always account for matches across all reconciliations when computing remaining amounts. Group matching supports 1:N or N:1, not N:M.
 
@@ -124,7 +124,7 @@ The user prefers minimal, incremental changes and wants the actual GitHub files 
 - One _unitOfWorkScope.Commit() per normal write operation. No inline comments unless requested. Make incremental edits directly against current GitHub files; do not paste full files unless asked.
 
 ### Latest known GitHub state (checked 2026-10-13)
-- Latest observed commits: `3647c356dce0bb7249fb70ae51f101a1192135fc` — normalize tracking numbers in candidate scoring; `de6356bbaf17e2ba19a7cc09539ebc4b7315610c` — normalize tracking numbers in AutoMatch scoring.
+- Latest observed commits: `15858128ea2cf0644399b367182cc6e68a11ad33` — partial tracking-number matching in candidate scoring; `476dc799b2d25627ee5e76c018a2f1bf3d8015a7` — partial tracking-number matching in AutoMatch; `3647c356dce0bb7249fb70ae51f101a1192135fc` — normalize tracking numbers in candidate scoring; `de6356bbaf17e2ba19a7cc09539ebc4b7315610c` — normalize tracking numbers in AutoMatch scoring.
 - Relevant commits: 1ef4aaa221ac1b30fbe6f8caee9dd2671a714950 (exact AutoMatch date); 708dc76439c6550436ba606ca578ed194d1d9653 (additional AutoMatch condition); 314fd7c01a5928e8c854945763b2a800dcd3c722 (load matched operations); 17aab1334333c893e3ce45ed8f488f6222cee3d9 (show registered matches); 139f27115154f1db3f468e84d36f8668255e091a (AutoMatch result scores); acff7694258a9c2511115a69a7afb358d7a35dc3 (score-based AutoMatch); 9da0d93f3ecb2980a116929cdbbcaabd4e1ccacb (candidate scores); 850878f1fa2766a203fca2739892346f69a0273d (score column); f07429b391c6280f7e2b601f5f798637d07ea8fc (candidate score display); c9cf6fa04527f270f24ed7b442ad87fce2c9408f (date-picker getDate filtering).
 - UX: exact existing account/from/to reconciliation is loaded; a free range creates and loads; any other overlap errors with “بازه زمانی وارد شده با یک مغایرت بانکی موجود تداخل دارد.”
 
