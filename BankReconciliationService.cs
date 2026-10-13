@@ -124,6 +124,7 @@ namespace CDS.BIMS.Application.Service.Financial
             {
                 var reconciliation =
                     _bankReconciliationRepository.Query
+                        .Include(x => x.BankAccount)
                         .FirstOrDefault(x => x.Id == id);
 
                 if (reconciliation == null)
