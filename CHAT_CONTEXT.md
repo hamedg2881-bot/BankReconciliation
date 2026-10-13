@@ -157,3 +157,13 @@ The user prefers minimal, incremental changes and wants the actual GitHub files 
 - The UI calls the existing `POST /BankReconciliation/Delete` endpoint. `BankReconciliationService.Delete` already rejects finalized reconciliations server-side and deletes only the reconciliation and its match records.
 - After successful deletion, the history table reloads. If the deleted reconciliation was currently loaded, the UI returns to the editable/new-reconciliation state.
 - Code change: `BankReconciliation.js`, commit `3b2d215c0c7f3398e602946f5cae7b882e440401`.
+
+### Account reconciliation timeline (2026-10-13)
+- The main page now contains a compact horizontally scrollable timeline for the selected bank account, positioned immediately below the account/date filters.
+- `GET /BankReconciliation/GetTimeline?bankAccountId=...` returns the latest 12 history records using the existing `GetHistory` service method; the existing full-history modal remains available through “همه سوابق”.
+- Timeline cards show the reconciliation date range and whether it is finalized or still being edited. The currently loaded reconciliation is highlighted; selecting a card loads that reconciliation through the existing `selectReconciliation` flow.
+- The timeline refreshes when the bank account changes, after creating/loading a reconciliation, after finalization, and after deleting a reconciliation.
+- Relevant files: `Index.cshtml`, `BankReconciliationController.cs`, `BankReconciliation.js`, and `BankReconciliation.css`.
+- Implementation commits: `bf547ff14281c2416376eb23656aab0b79b24253` (markup), `23c91eeb131e6ed639c4392283246f3e0e6b5973` (endpoint), `0606d03e1ca63604ea26f741589fe677fe6cb7da` (interaction), `cc6904791ba222d156f517862dfedca76c068ef6` (styles).
+- The timeline is limited to the latest 12 records to keep the main page compact; the complete server-side history table remains available for older records.
+
