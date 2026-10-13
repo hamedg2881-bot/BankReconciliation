@@ -90,7 +90,7 @@ namespace CDS.BIMS.Presentation.WebUI.Controllers.Financial
             var result = _bankReconciliationService.GetHistory(
                 bankAccountId,
                 0,
-                12,
+                int.MaxValue,
                 null);
 
             return Json(result, JsonRequestBehavior.AllowGet);
