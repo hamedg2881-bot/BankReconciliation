@@ -2534,6 +2534,8 @@
             this.state.status = null;
             this.state.search = "";
 
+            $("#bankReconciliationArea").removeClass("br-readonly");
+
             $("#BankAccountId")
                 .prop("disabled", false);
 
@@ -2542,6 +2544,22 @@
 
             $("#ToDate")
                 .prop("disabled", false);
+
+            $("#FromDate, #ToDate").each(function () {
+                var input = $(this);
+
+                input.MdPersianDateTimePicker({
+                    targetTextSelector: "#" + input.attr("id"),
+                    enableTimePicker: false,
+                    textFormat: "yyyy/MM/dd",
+                    isGregorian: false
+                });
+
+                input
+                    .closest(".md-form")
+                    .find("label")
+                    .toggleClass("active", !!input.val());
+            });
 
             $("#txtSearch")
                 .val("");
