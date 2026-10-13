@@ -413,7 +413,7 @@ namespace CDS.BIMS.Application.Service.Financial
                         {
                             filteredQuery = filteredQuery.Where(x => x.Transaction.TrackingNumber != null && x.Transaction.TrackingNumber.Contains(value));
                         }
-                        else if (columnFilter.Key == "Type")
+                        else if (columnFilter.Key == "Type" || columnFilter.Key == "Credit")
                         {
                             if (value == "واریز")
                                 filteredQuery = filteredQuery.Where(x => x.Transaction.Credit > 0);
