@@ -2365,7 +2365,7 @@
 
                     $("#accountTimelineCaption").text(
                         totalCount
-                            ? self.formatNumber(totalCount) + " دوره ثبت‌شده؛ روزهای خالی بین دوره‌ها نیز مشخص شده‌اند."
+                            ? self.formatNumber(totalCount) + " دوره ثبت‌شده."
                             : "هنوز سابقه‌ای برای این حساب ثبت نشده است."
                     );
 
