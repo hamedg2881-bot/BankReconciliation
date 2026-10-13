@@ -2333,7 +2333,7 @@
 
             $("#accountTimelineTrack").empty();
             $("#accountTimelineCaption").text(
-                bankAccountId ? "آخرین دوره‌های ثبت‌شده برای حساب انتخاب‌شده" : "برای مشاهده سوابق، حساب بانکی را انتخاب کنید."
+                bankAccountId ? "سوابق و روزهای بدون دوره بین آن‌ها" : "برای مشاهده سوابق، حساب بانکی را انتخاب کنید."
             );
             $("#accountTimelineEmpty")
                 .text(bankAccountId ? "هنوز سابقه‌ای برای این حساب ثبت نشده است." : "برای مشاهده خط زمانی، یک حساب بانکی انتخاب کنید.")
@@ -2358,12 +2358,14 @@
                     }
 
                     var result = response.Result || {};
-                    var items = result.Items || [];
+                    var items = (result.Items || []).slice().sort(function (a, b) {
+                        return self.timelineDateValue(b.FromDate) - self.timelineDateValue(a.FromDate);
+                    });
                     var totalCount = Number(result.TotalCount) || 0;
 
                     $("#accountTimelineCaption").text(
                         totalCount
-                            ? self.formatNumber(totalCount) + " دوره ثبت‌شده؛ آخرین " + self.formatNumber(items.length) + " دوره نمایش داده می‌شود."
+                            ? self.formatNumber(totalCount) + " دوره ثبت‌شده؛ روزهای خالی بین دوره‌ها نیز مشخص شده‌اند."
                             : "هنوز سابقه‌ای برای این حساب ثبت نشده است."
                     );
 
@@ -2372,7 +2374,9 @@
                         return;
                     }
 
-                    var markup = items.map(function (item) {
+                    var markup = [];
+
+                    items.forEach(function (item, index) {
                         var id = Number(item.Id);
                         var finalized = Number(item.State) === 1;
                         var active = id === Number(self.state.reconciliationId);
@@ -2382,7 +2386,8 @@
                             ? '<span class="br-timeline-current">دوره بازشده</span>'
                             : "";
 
-                        return '<button type="button" role="listitem" class="br-timeline-item ' + stateClass +
+                        markup.push(
+                            '<button type="button" role="listitem" class="br-timeline-item ' + stateClass +
                             (active ? ' br-timeline-active' : '') +
                             '" data-id="' + id + '" title="بازکردن این دوره">' +
                             '<span class="br-timeline-marker"><i class="fas ' + (finalized ? 'fa-check' : 'fa-pencil-alt') + '"></i></span>' +
@@ -2391,10 +2396,46 @@
                             '<span class="br-timeline-separator">تا</span>' +
                             '<span class="br-timeline-date">' + self.escapeHtml(self.formatDate(item.ToDate)) + '</span>' +
                             activeMarkup +
-                            '</button>';
-                    }).join("");
+                            '</button>'
+                        );
 
-                    $("#accountTimelineTrack").html(markup);
+                        var olderItem = items[index + 1];
+
+                        if (!olderItem) {
+                            return;
+                        }
+
+                        var gapStart = self.timelineDateValue(olderItem.ToDate);
+                        var gapEnd = self.timelineDateValue(item.FromDate);
+                        var gapStartDate = new Date(gapStart);
+                        var gapEndDate = new Date(gapEnd);
+
+                        gapStartDate.setHours(0, 0, 0, 0);
+                        gapEndDate.setHours(0, 0, 0, 0);
+                        gapStartDate.setDate(gapStartDate.getDate() + 1);
+                        gapEndDate.setDate(gapEndDate.getDate() - 1);
+
+                        var gapDays = Math.floor((gapEndDate - gapStartDate) / 86400000) + 1;
+
+                        if (gapDays > 0) {
+                            var gapDates = self.escapeHtml(self.formatDate(gapStartDate)) +
+                                (gapDays > 1
+                                    ? '<span class="br-timeline-separator">تا</span><span class="br-timeline-date">' +
+                                        self.escapeHtml(self.formatDate(gapEndDate)) + '</span>'
+                                    : "");
+
+                            markup.push(
+                                '<div role="listitem" class="br-timeline-gap" title="در این بازه دوره‌ای ثبت نشده است">' +
+                                '<span class="br-timeline-gap-icon"><i class="fas fa-calendar-times"></i></span>' +
+                                '<span class="br-timeline-gap-title">بدون سابقه</span>' +
+                                '<span class="br-timeline-gap-count">' + self.formatNumber(gapDays) + ' روز</span>' +
+                                '<span class="br-timeline-date">' + gapDates + '</span>' +
+                                '</div>'
+                            );
+                        }
+                    });
+
+                    $("#accountTimelineTrack").html(markup.join(""));
                     $("#accountTimelineEmpty").hide();
 
                 })
@@ -2408,6 +2449,21 @@
                     $("#accountTimelineLoading").addClass("d-none");
                     self.state.accountTimelineRequest = null;
                 });
+
+        },
+
+        timelineDateValue: function (value) {
+
+            if (!value) {
+                return 0;
+            }
+
+            if (typeof value === "string" && value.indexOf("/Date(") === 0) {
+                return parseInt(value.replace("/Date(", "").replace(")/", ""), 10) || 0;
+            }
+
+            var date = new Date(value);
+            return isNaN(date.getTime()) ? 0 : date.getTime();
 
         },
 
