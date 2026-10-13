@@ -3091,6 +3091,10 @@
                 return "";
             }
 
+            if (value instanceof Date) {
+                return value.toLocaleDateString("fa-IR");
+            }
+
             if (
                 typeof value === "string" &&
                 value.indexOf("/Date(") === 0
