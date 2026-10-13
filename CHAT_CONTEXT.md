@@ -126,3 +126,8 @@ The user prefers minimal, incremental changes and wants the actual GitHub files 
 - Latest observed commit: f58acc067b1ff72444e2db6cf4e279ffb406a78c — Require an additional AutoMatch criterion.
 - Relevant commits: 1ef4aaa221ac1b30fbe6f8caee9dd2671a714950 (exact AutoMatch date); 708dc76439c6550436ba606ca578ed194d1d9653 (additional AutoMatch condition); 314fd7c01a5928e8c854945763b2a800dcd3c722 (load matched operations); 17aab1334333c893e3ce45ed8f488f6222cee3d9 (show registered matches); 139f27115154f1db3f468e84d36f8668255e091a (AutoMatch result scores); acff7694258a9c2511115a69a7afb358d7a35dc3 (score-based AutoMatch); 9da0d93f3ecb2980a116929cdbbcaabd4e1ccacb (candidate scores); 850878f1fa2766a203fca2739892346f69a0273d (score column); f07429b391c6280f7e2b601f5f798637d07ea8fc (candidate score display); c9cf6fa04527f270f24ed7b442ad87fce2c9408f (date-picker getDate filtering).
 - UX: exact existing account/from/to reconciliation is loaded; a free range creates and loads; any other overlap errors with “بازه زمانی وارد شده با یک مغایرت بانکی موجود تداخل دارد.”
+
+
+### Date input label fix (2026-10-13)
+- For the main reconciliation date fields `#FromDate` and `#ToDate`, keep the enclosing `.md-form label` class `active` synchronized with the input value on `input`, `change`, and `blur`. This handles date-picker selection where the label may otherwise overlap the selected date.
+- Code change: `BankReconciliation.js`, commit `277819a6137a735452296a58ec491585ad351f10`.
