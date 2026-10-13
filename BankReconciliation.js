@@ -424,7 +424,7 @@
                     },
 
                     {
-                        data: null,
+                        data: "Credit",
                         name: "Type",
                         className: "text-center",
                         width: "75px",
