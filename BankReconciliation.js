@@ -53,8 +53,32 @@
 
                         params.page = params.page || 1;
 
+                        var results = (data.results || []).map(function (item) {
+                            var id = item.id != null
+                                ? item.id
+                                : item.Id != null
+                                    ? item.Id
+                                    : item.value != null
+                                        ? item.value
+                                        : item.Value;
+
+                            var text = item.text ||
+                                item.Text ||
+                                item.title ||
+                                item.Title ||
+                                item.BankAccountTitle ||
+                                item.AccountTitle ||
+                                item.AccountNumber ||
+                                item.accountNumber;
+
+                            return $.extend({}, item, {
+                                id: id,
+                                text: text || ""
+                            });
+                        });
+
                         return {
-                            results: data.results,
+                            results: results,
                             pagination: data.pagination
                         };
 
