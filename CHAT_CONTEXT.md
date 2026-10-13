@@ -105,7 +105,7 @@ The user prefers minimal, incremental changes and wants the actual GitHub files 
 
 ### Candidate score and text matching
 - Exact amount +100; exact tracking +50; tracking inside bank description +50; counterpart Center title inside bank description +30; exact date +20; one-day difference +10.
-- Candidate DTO includes MatchScore and MatchScoreDetails. Normalize Arabic Yeh (ي/ى) to Persian Yeh (ی), Arabic Kaf (ك) to Persian Kaf (ک), and whitespace for matching.
+- Candidate DTO includes MatchScore and MatchScoreDetails. Text matching normalizes Arabic Yeh (ي/ى) to Persian Yeh (ی), Arabic Kaf (ك) to Persian Kaf (ک), Persian/Arabic digits to English digits, and whitespace. Direct tracking-number comparison uses the same normalization in candidate scoring and AutoMatch.
 - Candidate date tolerance is configurable from 0 to 2 calendar days. Candidate must use an allowed account, same Center, opposite direction, and positive remaining amount. Normal mode requires exact remaining amount and CanMatch; group mode uses CanGroupMatch.
 - Always account for matches across all reconciliations when computing remaining amounts. Group matching supports 1:N or N:1, not N:M.
 
@@ -123,7 +123,7 @@ The user prefers minimal, incremental changes and wants the actual GitHub files 
 - One _unitOfWorkScope.Commit() per normal write operation. No inline comments unless requested. Make incremental edits directly against current GitHub files; do not paste full files unless asked.
 
 ### Latest known GitHub state (checked 2026-10-13)
-- Latest observed commit: f58acc067b1ff72444e2db6cf4e279ffb406a78c — Require an additional AutoMatch criterion.
+- Latest observed commits: `3647c356dce0bb7249fb70ae51f101a1192135fc` — normalize tracking numbers in candidate scoring; `de6356bbaf17e2ba19a7cc09539ebc4b7315610c` — normalize tracking numbers in AutoMatch scoring.
 - Relevant commits: 1ef4aaa221ac1b30fbe6f8caee9dd2671a714950 (exact AutoMatch date); 708dc76439c6550436ba606ca578ed194d1d9653 (additional AutoMatch condition); 314fd7c01a5928e8c854945763b2a800dcd3c722 (load matched operations); 17aab1334333c893e3ce45ed8f488f6222cee3d9 (show registered matches); 139f27115154f1db3f468e84d36f8668255e091a (AutoMatch result scores); acff7694258a9c2511115a69a7afb358d7a35dc3 (score-based AutoMatch); 9da0d93f3ecb2980a116929cdbbcaabd4e1ccacb (candidate scores); 850878f1fa2766a203fca2739892346f69a0273d (score column); f07429b391c6280f7e2b601f5f798637d07ea8fc (candidate score display); c9cf6fa04527f270f24ed7b442ad87fce2c9408f (date-picker getDate filtering).
 - UX: exact existing account/from/to reconciliation is loaded; a free range creates and loads; any other overlap errors with “بازه زمانی وارد شده با یک مغایرت بانکی موجود تداخل دارد.”
 
