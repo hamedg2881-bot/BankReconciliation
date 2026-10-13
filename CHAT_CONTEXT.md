@@ -131,3 +131,9 @@ The user prefers minimal, incremental changes and wants the actual GitHub files 
 ### Date input label fix (2026-10-13)
 - For the main reconciliation date fields `#FromDate` and `#ToDate`, keep the enclosing `.md-form label` class `active` synchronized with the input value on `input`, `change`, and `blur`. This handles date-picker selection where the label may otherwise overlap the selected date.
 - Code change: `BankReconciliation.js`, commit `277819a6137a735452296a58ec491585ad351f10`.
+
+
+### Re-selecting dates after loading a reconciliation (2026-10-13)
+- Clicking `#btnChangeReconciliation` calls `prepareNewReconciliation()`; this must remove `.br-readonly` from `#bankReconciliationArea`, re-enable the account/date fields, and reinitialize the Persian date pickers on `#FromDate` and `#ToDate` so another date range can be selected after loading a history item or range.
+- Preserve the current field values when entering change mode; the user can edit/replace them and click `نمایش`.
+- Code change: `BankReconciliation.js`, commit `339ba4c8aa94325c1cc50fa67afc0710414fe203`.
