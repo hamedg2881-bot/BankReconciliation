@@ -20,6 +20,7 @@
             totalPages: 0,
             reconciliationState: 0,
             reconciliationHistory: [],
+            accountTimelineRequest: null,
             bankTable: null,
             candidateTable: null
         },
@@ -1122,10 +1123,18 @@
 
             });
 
-            $("#btnHistory").on("click", function () {
+            $("#btnHistory, #btnTimelineHistory").on("click", function () {
 
                 self.loadReconciliationHistory();
 
+            });
+
+            $("#BankAccountId").on("change", function () {
+                self.loadAccountTimeline();
+            });
+
+            $("#accountTimelineTrack").on("click", ".br-timeline-item", function () {
+                self.selectReconciliation(Number($(this).data("id")));
             });
 
             $("#reconciliationHistoryTable").on("input change", ".br-history-column-filter", function () {
@@ -1778,6 +1787,7 @@
                     self.renderReconciliationContext(response.Result.Reconciliation || response.Result);
                     self.updateButtons();
                     self.reloadBankTable();
+                    self.loadAccountTimeline();
 
                 })
                 .fail(function () {
@@ -2137,6 +2147,7 @@
                     );
 
                     self.reloadBankTable();
+                    self.loadAccountTimeline();
 
                 })
                 .fail(function () {
@@ -2307,6 +2318,96 @@
 
             $("#selectedTransactionRemaining")
                 .text("-");
+
+        },
+
+        loadAccountTimeline: function () {
+
+            var self = this;
+            var bankAccountId = Number($("#BankAccountId").val()) || 0;
+
+            if (this.state.accountTimelineRequest) {
+                this.state.accountTimelineRequest.abort();
+                this.state.accountTimelineRequest = null;
+            }
+
+            $("#accountTimelineTrack").empty();
+            $("#accountTimelineCaption").text(
+                bankAccountId ? "آخرین دوره‌های ثبت‌شده برای حساب انتخاب‌شده" : "برای مشاهده سوابق، حساب بانکی را انتخاب کنید."
+            );
+            $("#accountTimelineEmpty")
+                .text(bankAccountId ? "هنوز سابقه‌ای برای این حساب ثبت نشده است." : "برای مشاهده خط زمانی، یک حساب بانکی انتخاب کنید.")
+                .toggle(!bankAccountId);
+            $("#accountTimelineLoading").toggleClass("d-none", !bankAccountId);
+
+            if (!bankAccountId) {
+                return;
+            }
+
+            this.state.accountTimelineRequest = $.ajax({
+                url: "/BankReconciliation/GetTimeline",
+                type: "GET",
+                data: { bankAccountId: bankAccountId },
+                dataType: "json"
+            })
+                .done(function (response) {
+
+                    if (!self.handleResponse(response)) {
+                        $("#accountTimelineEmpty").text("دریافت خط زمانی با خطا مواجه شد.").show();
+                        return;
+                    }
+
+                    var result = response.Result || {};
+                    var items = result.Items || [];
+                    var totalCount = Number(result.TotalCount) || 0;
+
+                    $("#accountTimelineCaption").text(
+                        totalCount
+                            ? self.formatNumber(totalCount) + " دوره ثبت‌شده؛ آخرین " + self.formatNumber(items.length) + " دوره نمایش داده می‌شود."
+                            : "هنوز سابقه‌ای برای این حساب ثبت نشده است."
+                    );
+
+                    if (!items.length) {
+                        $("#accountTimelineEmpty").text("هنوز سابقه‌ای برای این حساب ثبت نشده است.").show();
+                        return;
+                    }
+
+                    var markup = items.map(function (item) {
+                        var id = Number(item.Id);
+                        var finalized = Number(item.State) === 1;
+                        var active = id === Number(self.state.reconciliationId);
+                        var stateClass = finalized ? "br-timeline-finalized" : "br-timeline-open";
+                        var stateText = finalized ? "نهایی‌شده" : "در حال ویرایش";
+                        var activeMarkup = active
+                            ? '<span class="br-timeline-current">دوره بازشده</span>'
+                            : "";
+
+                        return '<button type="button" role="listitem" class="br-timeline-item ' + stateClass +
+                            (active ? ' br-timeline-active' : '') +
+                            '" data-id="' + id + '" title="بازکردن این دوره">' +
+                            '<span class="br-timeline-marker"><i class="fas ' + (finalized ? 'fa-check' : 'fa-pencil-alt') + '"></i></span>' +
+                            '<span class="br-timeline-item-state">' + stateText + '</span>' +
+                            '<span class="br-timeline-date">' + self.escapeHtml(self.formatDate(item.FromDate)) + '</span>' +
+                            '<span class="br-timeline-separator">تا</span>' +
+                            '<span class="br-timeline-date">' + self.escapeHtml(self.formatDate(item.ToDate)) + '</span>' +
+                            activeMarkup +
+                            '</button>';
+                    }).join("");
+
+                    $("#accountTimelineTrack").html(markup);
+                    $("#accountTimelineEmpty").hide();
+
+                })
+                .fail(function (xhr, status) {
+                    if (status === "abort") {
+                        return;
+                    }
+                    $("#accountTimelineEmpty").text("دریافت خط زمانی با خطا مواجه شد.").show();
+                })
+                .always(function () {
+                    $("#accountTimelineLoading").addClass("d-none");
+                    self.state.accountTimelineRequest = null;
+                });
 
         },
 
@@ -2526,6 +2627,7 @@
                         );
 
                         self.reloadReconciliationHistory();
+                        self.loadAccountTimeline();
 
                     })
                     .fail(function () {
@@ -2607,6 +2709,7 @@
                     self.updateButtons();
                     self.reloadBankTable();
                     self.reloadCandidateTable();
+                    self.loadAccountTimeline();
 
                     $("#reconciliationHistoryModal").modal("hide");
 
