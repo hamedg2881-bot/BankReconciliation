@@ -149,3 +149,11 @@ The user prefers minimal, incremental changes and wants the actual GitHub files 
 - `BankReconciliationService.Get(long id)` must eagerly load `BankAccount` before mapping the entity to `BankReconciliationDto`; otherwise the navigation property may be null and the history selection falls back to the generic `حساب بانکی` label.
 - Code change: `BankReconciliationService.cs`, commit `122adaabe0905fe1d0e7e0fe9ed3d12a12a99956`; query now includes `.Include(x => x.BankAccount)`.
 - The current `BankReconciliation.js` Select2 `processResults` mapping also supports common alternative response keys for the account title.
+
+
+### Delete open reconciliations from history (2026-10-13)
+- The history table shows a Delete button only when `State != 1` (not finalized); finalized rows retain only the Select action.
+- Deletion requires a SweetAlert warning and explicit confirmation. The warning explains that the reconciliation and its match records are deleted, but bank transactions and accounting documents are not.
+- The UI calls the existing `POST /BankReconciliation/Delete` endpoint. `BankReconciliationService.Delete` already rejects finalized reconciliations server-side and deletes only the reconciliation and its match records.
+- After successful deletion, the history table reloads. If the deleted reconciliation was currently loaded, the UI returns to the editable/new-reconciliation state.
+- Code change: `BankReconciliation.js`, commit `3b2d215c0c7f3398e602946f5cae7b882e440401`.
