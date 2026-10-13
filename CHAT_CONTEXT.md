@@ -142,3 +142,10 @@ The user prefers minimal, incremental changes and wants the actual GitHub files 
 
 ### Bank account Select2 display fix (2026-10-13)
 - In `BankReconciliation.js`, normalize `/BankAccount/GetFullSelect` result items for Select2: preserve existing `id/text` payloads and map common alternative key names (`Id/Value` and `Text/Title/BankAccountTitle/AccountTitle/AccountNumber`) so the selected account title is displayed.
+
+
+### Bank account title when selecting a history item (2026-10-13)
+- `selectReconciliation()` loads the selected item from `GET /BankReconciliation/Get` and displays `BankAccountTitle` in the Select2 option.
+- `BankReconciliationService.Get(long id)` must eagerly load `BankAccount` before mapping the entity to `BankReconciliationDto`; otherwise the navigation property may be null and the history selection falls back to the generic `حساب بانکی` label.
+- Code change: `BankReconciliationService.cs`, commit `122adaabe0905fe1d0e7e0fe9ed3d12a12a99956`; query now includes `.Include(x => x.BankAccount)`.
+- The current `BankReconciliation.js` Select2 `processResults` mapping also supports common alternative response keys for the account title.
