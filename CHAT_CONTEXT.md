@@ -138,3 +138,7 @@ The user prefers minimal, incremental changes and wants the actual GitHub files 
 - Clicking `#btnChangeReconciliation` calls `prepareNewReconciliation()`; this must remove `.br-readonly` from `#bankReconciliationArea`, re-enable the account/date fields, and reinitialize the Persian date pickers on `#FromDate` and `#ToDate` so another date range can be selected after loading a history item or range.
 - Preserve the current field values when entering change mode; the user can edit/replace them and click `نمایش`.
 - Code change: `BankReconciliation.js`, commit `339ba4c8aa94325c1cc50fa67afc0710414fe203`.
+
+
+### Bank account Select2 display fix (2026-10-13)
+- In `BankReconciliation.js`, normalize `/BankAccount/GetFullSelect` result items for Select2: preserve existing `id/text` payloads and map common alternative key names (`Id/Value` and `Text/Title/BankAccountTitle/AccountTitle/AccountNumber`) so the selected account title is displayed.
