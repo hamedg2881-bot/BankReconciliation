@@ -2437,9 +2437,17 @@
                             className: "text-center",
                             orderable: false,
                             render: function (data, type, row) {
-                                return '<button type="button" class="btn btn-sm bg-charkheh2-lighten color-charkheh1 br-history-select" data-id="' +
+                                var buttons = '<button type="button" class="btn btn-sm bg-charkheh2-lighten color-charkheh1 br-history-select" data-id="' +
                                     Number(row.Id) +
                                     '"><i class="fas fa-folder-open ml-1"></i> انتخاب</button>';
+
+                                if (Number(row.State) !== 1) {
+                                    buttons += ' <button type="button" class="btn btn-sm btn-danger br-history-delete" data-id="' +
+                                        Number(row.Id) +
+                                        '"><i class="fas fa-trash ml-1"></i> حذف</button>';
+                                }
+
+                                return buttons;
                             }
                         }
                     ],
@@ -2448,6 +2456,12 @@
                             .off("click")
                             .on("click", function () {
                                 self.selectReconciliation(Number($(this).data("id")));
+                            });
+
+                        $("#reconciliationHistoryTable .br-history-delete")
+                            .off("click")
+                            .on("click", function () {
+                                self.deleteHistoryReconciliation(Number($(this).data("id")));
                             });
                     }
                 });
@@ -2462,6 +2476,63 @@
             if (this.historyTable) {
                 this.historyTable.ajax.reload(null, true);
             }
+
+        },
+
+        deleteHistoryReconciliation: function (reconciliationId) {
+
+            var self = this;
+
+            if (!reconciliationId) {
+                return;
+            }
+
+            swal({
+                title: "حذف مغایرت بانکی؟",
+                text: "این عملیات برگشت‌پذیر نیست. مغایرت و سوابق تطبیق آن حذف می‌شوند؛ تراکنش‌های بانکی و اسناد حسابداری حذف نخواهند شد.",
+                type: "warning",
+                showCancelButton: true,
+                buttonsStyling: false,
+                confirmButtonClass: "btn btn-danger",
+                confirmButtonText: "بله، حذف شود",
+                cancelButtonText: "انصراف",
+                cancelButtonClass: "btn btn-light",
+                background: "rgba(255, 255, 255, 1)"
+            }).then(function (result) {
+
+                if (!result) {
+                    return;
+                }
+
+                $.ajax({
+                    url: "/BankReconciliation/Delete",
+                    type: "POST",
+                    data: {
+                        reconciliationId: reconciliationId
+                    }
+                })
+                    .done(function (response) {
+
+                        if (!self.handleResponse(response)) {
+                            return;
+                        }
+
+                        if (Number(self.state.reconciliationId) === reconciliationId) {
+                            self.prepareNewReconciliation();
+                        }
+
+                        self.showSuccess(
+                            response.Message || "مغایرت بانکی حذف شد."
+                        );
+
+                        self.reloadReconciliationHistory();
+
+                    })
+                    .fail(function () {
+                        self.showError("خطا در حذف مغایرت بانکی.");
+                    });
+
+            });
 
         },
 
