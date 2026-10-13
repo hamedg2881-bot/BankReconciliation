@@ -2415,7 +2415,7 @@
                         gapStartDate.setDate(gapStartDate.getDate() + 1);
                         gapEndDate.setDate(gapEndDate.getDate() - 1);
 
-                        var gapDays = Math.floor((gapEndDate - gapStartDate) / 86400000) + 1;
+                        var gapDays = Math.round((gapEndDate - gapStartDate) / 86400000) + 1;
 
                         if (gapDays > 0) {
                             var gapDates = self.escapeHtml(self.formatDate(gapStartDate)) +
