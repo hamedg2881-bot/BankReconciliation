@@ -84,6 +84,18 @@ namespace CDS.BIMS.Presentation.WebUI.Controllers.Financial
                 JsonRequestBehavior.AllowGet);
         }
 
+        [HttpGet]
+        public JsonResult GetTimeline(int bankAccountId)
+        {
+            var result = _bankReconciliationService.GetHistory(
+                bankAccountId,
+                0,
+                12,
+                null);
+
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
         [HttpPost]
         public JsonResult GetPage(
             long reconciliationId,
