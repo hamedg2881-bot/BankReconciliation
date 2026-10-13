@@ -112,6 +112,7 @@ The user prefers minimal, incremental changes and wants the actual GitHub files 
 ### UI and history
 - Relevant files: BankReconciliation.js, BankReconciliation.css, Index.cshtml, BankReconciliationController.cs, BankReconciliationService.cs, BankReconciliationCandidateService.cs.
 - History may contain 1,000 rows; keep server-side DataTables with column filters.
+- Bank transaction Type filter: DataTables column uses `data: "Credit"` (instead of `data: null`) so the server receives a valid field key; `GetPage` handles the `Credit` key as the transaction type filter and matches Persian values `واریز` / `برداشت`.
 - Clearable date filters: #FromDate, #ToDate, #bankFilterTransactionDate, #candidateFilterAccountingDocDate, #historyFilterFromDate, #historyFilterToDate.
 - Modal date pickers may need initialization on shown.bs.modal. Date filtering uses MdPersianDateTimePicker("getDate") and Persian calendar formatting. Do not normalize Persian digits server-side; user explicitly rejected this.
 - DataTables scrollX was disabled to avoid horizontal overflow. Preserve unless a tested fix requires otherwise. Ensure date input labels stay initialized after history selection.
