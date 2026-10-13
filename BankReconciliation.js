@@ -91,6 +91,13 @@
                 isGregorian: false
             });
 
+            $("#FromDate, #ToDate").on("input change blur", function () {
+                $(this)
+                    .closest(".md-form")
+                    .find("label")
+                    .toggleClass("active", !!$(this).val());
+            });
+
             this.initDateClearButtons();
 
             $("#candidateDateTolerance").on("change", function () {
