@@ -1123,7 +1123,7 @@
 
             });
 
-            $("#btnHistory, #btnTimelineHistory").on("click", function () {
+            $("#btnHistory").on("click", function () {
 
                 self.loadReconciliationHistory();
 
