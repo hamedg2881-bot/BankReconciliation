@@ -285,9 +285,9 @@ namespace CDS.BIMS.Application.Service.Financial
                             x.Cheque);
 
                         var trackingMatched =
-                            !string.IsNullOrWhiteSpace(transaction.TrackingNumber) &&
-                            !string.IsNullOrWhiteSpace(trackingNumber) &&
-                            NormalizeText(transaction.TrackingNumber) == NormalizeText(trackingNumber);
+                            TrackingNumbersMatch(
+                                transaction.TrackingNumber,
+                                trackingNumber);
 
                         var amountDifference = Math.Abs(
                             bankRemainingAmount - remaining);
@@ -710,6 +710,19 @@ namespace CDS.BIMS.Application.Service.Financial
                 return BankReconciliationStatus.Partial;
 
             return BankReconciliationStatus.Matched;
+        }
+
+        private bool TrackingNumbersMatch(string first, string second)
+        {
+            if (string.IsNullOrWhiteSpace(first) ||
+                string.IsNullOrWhiteSpace(second))
+                return false;
+
+            var normalizedFirst = NormalizeText(first);
+            var normalizedSecond = NormalizeText(second);
+
+            return normalizedFirst.Contains(normalizedSecond) ||
+                   normalizedSecond.Contains(normalizedFirst);
         }
 
         private string GetTrackingNumber(
