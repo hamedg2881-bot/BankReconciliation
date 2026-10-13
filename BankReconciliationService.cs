@@ -1327,9 +1327,9 @@ namespace CDS.BIMS.Application.Service.Financial
 
                         var tracking = GetTrackingNumber(detail);
                         var trackingMatched =
-                            !string.IsNullOrWhiteSpace(transaction.TrackingNumber) &&
-                            !string.IsNullOrWhiteSpace(tracking) &&
-                            NormalizeText(transaction.TrackingNumber) == NormalizeText(tracking);
+                            TrackingNumbersMatch(
+                                transaction.TrackingNumber,
+                                tracking);
 
                         var trackingInDescription =
                             ContainsText(transaction.Description, tracking);
@@ -1596,6 +1596,21 @@ namespace CDS.BIMS.Application.Service.Financial
                     .Replace("٨", "8")
                     .Replace("٩", "9")
                     .Split((char[])null, StringSplitOptions.RemoveEmptyEntries));
+        }
+
+        private bool TrackingNumbersMatch(
+            string first,
+            string second)
+        {
+            if (string.IsNullOrWhiteSpace(first) ||
+                string.IsNullOrWhiteSpace(second))
+                return false;
+
+            var normalizedFirst = NormalizeText(first);
+            var normalizedSecond = NormalizeText(second);
+
+            return normalizedFirst.Contains(normalizedSecond) ||
+                   normalizedSecond.Contains(normalizedFirst);
         }
 
         private BankReconciliation GetReconciliationForWrite(
